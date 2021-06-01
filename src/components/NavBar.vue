@@ -15,10 +15,10 @@
                     <span class="<md:hidden">Blog</span>
                     <ri-article-line class="md:hidden" />
                 </router-link>
-                <router-link to="/projects">
+                <!-- <router-link to="/projects">
                     <span class="<md:hidden">Projects</span>
                     <ri-lightbulb-line class="md:hidden" />
-                </router-link>
+                </router-link>-->
                 <a href="https://github.com/ArcherGu" target="_blank" title="GitHub">
                     <uil-github-alt />
                 </a>

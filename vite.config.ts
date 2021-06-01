@@ -44,7 +44,7 @@ export default defineConfig({
         }),
 
         ViteMarkdown({
-            wrapperComponent: 'post',
+            wrapperComponent: 'Blog',
             wrapperClasses: 'prose m-auto',
             headEnabled: true,
             markdownItOptions: {

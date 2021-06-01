@@ -9,4 +9,4 @@ display: ""
     </h1>
 </div>
 
-<ListPosts />
+<BlogList />

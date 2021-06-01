@@ -1,6 +1,5 @@
-@import url('https://fonts.googleapis.com/css?family=Lato:700,400');
-@import url('https://fonts.googleapis.com/css?family=Dosis:400');
-@import './markdown.postcss';
+@import url("https://fonts.googleapis.com/css?family=Dosis:700,600");
+@import "./markdown.postcss";
 
 html,
 body,
@@ -8,13 +7,15 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: Dosis, Lato, sans-serif;
+  font-family: Dosis, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 :root {
   --c-bg: #fff;
-  --c-scrollbar: #eee;
-  --c-scrollbar-hover: #bbb;
+  --c-scrollbar: #ccc;
+  --c-scrollbar-hover: #aaa;
 }
 
 html {
@@ -66,7 +67,7 @@ html {
   scrollbar-color: var(--c-scrollbar) var(--c-bg);
 }
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
 }
 ::-webkit-scrollbar:horizontal {
   height: 6px;

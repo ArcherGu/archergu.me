@@ -18,6 +18,7 @@ export default defineConfig({
             typography: {
                 DEFAULT: {
                     css: [{
+                        "font-size": "1.2rem",
                         color: 'var(--fg)',
                         a: {
                             color: 'var(--fg-deeper)',
@@ -27,7 +28,7 @@ export default defineConfig({
                         code: { color: 'var(--fg-deep)' },
                         strong: { color: 'var(--fg-deep)' },
                         em: { color: 'inherit' },
-                        h1: { color: 'var(--fg-deeper)' },
+                        h1: { color: 'var(--fg-deeper)', 'font-weight': 600 },
                         h2: { color: 'var(--fg-deep)' },
                         h3: { color: 'inherit' },
                         h4: { color: 'inherit' },

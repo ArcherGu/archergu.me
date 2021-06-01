@@ -45,15 +45,15 @@ export const myIntroduce: Introduce[] = [
         weight: 5,
     },
     {
-        words: "I often hang out on Github. Open source is cool !",
+        words: "I often hang out on Github. Open source is cool!",
         keyword: ["Github", "Open Source"],
-        color: ["#555", "#86C166"],
+        color: ["#555", "#33a6b8"],
         weight: 6,
     },
     {
-        words: "Video game and movie are my favorite !",
+        words: "Video game and movie are my favorite!",
         keyword: ["Video Games 🎮", "Movies 🎥"],
-        color: ["#8F77B5", "#F19483"],
+        color: ["#B481BB", "#F19483"],
         weight: 6,
     }
 ];

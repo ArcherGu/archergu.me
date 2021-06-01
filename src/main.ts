@@ -2,7 +2,7 @@ import App from './App.vue';
 import routes from 'pages-generated';
 import { ViteSSG } from 'vite-ssg';
 import { RouterScrollBehavior } from 'vue-router';
-import './styles/index.postcss'
+import './styles/index.postcss';
 import 'windi.css';
 
 const scrollBehavior: RouterScrollBehavior = (to, from, savedPosition) => {

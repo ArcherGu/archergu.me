@@ -1,13 +1,13 @@
 /* https://github.com/antfu/prism-theme-vars */
-@import 'prism-theme-vars/base.css';
+@import "prism-theme-vars/base.css";
 
 :root {
   --prism-font-size: 0.9rem;
-  --prism-font-family: 'Fira Code', monospace;
+  --prism-font-family: "Fira Code", monospace;
 }
 
 :root {
-  --prism-font-family: 'Input Mono', monospace;
+  --prism-font-family: "Input Mono", monospace;
 }
 
 html:not(.dark) {
@@ -62,17 +62,19 @@ html.dark {
   --fg: #555;
   --fg-deep: #222;
   --fg-deeper: #000;
-  
+  --link: #00aa90;
+  font-size: 1.2rem;
   color: var(--fg);
 
   a {
     font-weight: inherit;
     text-decoration: none;
-    border-bottom: 1px solid rgba(125,125,125,0.1);
-    transition: border .3s ease-in-out;
+    border-bottom: 1px dotted rgba(125, 125, 125, 0.1);
+    transition: all 0.3s ease-in-out;
 
-    &:hover { 
-      border-bottom: 1px solid var(--fg);
+    &:hover {
+      color: var(--link);
+      border-bottom: 1px dotted var(--link);
     }
   }
 
@@ -90,10 +92,15 @@ html.dark .prose {
   --fg: #bbb;
   --fg-deep: #ddd;
   --fg-deeper: #fff;
+  --link: #33a6b8;
+
+  a code {
+    color: inherit;
+  }
 }
 
 a.item {
-  transition: .2s all ease-out;
+  transition: 0.2s all ease-out;
   text-decoration: none;
   border-bottom: none !important;
   opacity: 0.6;
@@ -105,10 +112,10 @@ a.item {
 
 a.header-anchor {
   float: left;
-  margin-top: .125em;
+  margin-top: 0.125em;
   margin-left: -1.2em;
-  padding-right: .50em;
-  font-size: .85em;
+  padding-right: 0.5em;
+  font-size: 0.85em;
   opacity: 0;
   text-decoration: none;
   border: 0 !important;
@@ -148,7 +155,6 @@ h6:focus .header-anchor {
 .prose blockquote > :last-child {
   margin-bottom: 0;
 }
-
 
 .prose blockquote p:first-of-type::before {
   content: none;

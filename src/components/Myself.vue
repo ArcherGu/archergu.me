@@ -2,7 +2,7 @@
     <div class="my-self text-center">
         <div ref="wordCloudRef"></div>
         <span ref="inputRef" class="text-lg"></span>
-        <button v-if="showReplay" @click="replay">
+        <button v-if="showReplay" @click="replay" class="icon-btn">
             <mdi-replay style="display: inline; vertical-align: text-top" />
         </button>
     </div>

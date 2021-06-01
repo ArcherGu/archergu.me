@@ -63,7 +63,6 @@ html.dark {
   --fg-deep: #222;
   --fg-deeper: #000;
   --link: #00aa90;
-  font-size: 1.2rem;
   color: var(--fg);
 
   a {
@@ -166,4 +165,12 @@ h6:focus .header-anchor {
 
 .prose svg {
   display: inline;
+}
+
+.prose > ul > li > *:first-child {
+  margin-top: auto;
+}
+
+.prose > ul > li > *:last-child {
+  margin-bottom: auto;
 }

@@ -18,7 +18,6 @@ export default defineConfig({
             typography: {
                 DEFAULT: {
                     css: [{
-                        "font-size": "1.2rem",
                         color: 'var(--fg)',
                         a: {
                             color: 'var(--fg-deeper)',

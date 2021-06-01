@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Archer Gu" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Archer Gu</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        (function () {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            const setting = localStorage.getItem('color-schema') || 'auto'
+            if (setting === 'dark' || (prefersDark && setting !== 'light'))
+                document.documentElement.classList.toggle('dark', true)
+        })()
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>

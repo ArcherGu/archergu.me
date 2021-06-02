@@ -3,13 +3,13 @@ title: 我的新网站
 date: 2021-06-01T14:00:00.000+00:00
 tags: Launch
 tagsColor: 70649A
-duration: 5min
+duration: 2min
 subtitle: Archer's new house
 ---
 
 Hi！我是顾不上 (Archer Gu)，这是我的新网站。
 
-实际上在此之前我有一个基于 <uil-wordpress /> [WordPress](https://wordpress.com/) 的小型网站，尽管它可以满足我的大部分需求，但是我仍然希望有一个更加 **轻便的**，**自由定制的**，**静态的** 个人网站。
+实际上在此之前我有一个基于 <uil-wordpress /> [WordPress](https://wordpress.com/) 的小型网站，它被部署在我的腾讯云上。一开始我还使用这个云服务器进行一些学习工作，后来它被渐渐的闲置，唯一在上面使用的服务也就剩下了这个网站（我已经很久没有 ssh 到服务器上去了）。随着服务器时间的到期，我暂时不考虑续费了。尽管 WordPress 可以满足我的大部分需求，但是我仍然希望有一个更加 **轻便的**，**自由定制的**，**静态的** 个人网站。
 
 今年初的时候我开始寻找一个适合我需求的静态网站框架，由于我最常用的前端技术栈是 <vscode-icons-file-type-vue /> [Vue.js](https://v3.vuejs.org/)，自然而然，[VuePress](https://vuepress.vuejs.org/) 进入了我的视线，但是我依然无法接受它，不是说 VuePress 存在什么缺点，相反的，VuePress 是一个非常不错的静态网站生成器，它默认提供了文档和博客的模板主题，你只需要专注于 <ri-markdown-line /> Markdown 的内容创作，VuePress 将自动根据你的 md 文件生成页面和路由。但是，作为一个爱折腾的人，VuePress 没法满足我对 **自由** 的追求。
 

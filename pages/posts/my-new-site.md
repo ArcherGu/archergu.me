@@ -1,8 +1,8 @@
 ---
 title: 我的新网站
 date: 2021-06-01T14:00:00.000+00:00
-tags: Launch
-tagsColor: 70649A
+badge: Launch
+badgeColor: "#70649A"
 duration: 2min
 subtitle: Archer's new house
 ---
@@ -24,7 +24,7 @@ Hi！我是顾不上 (Archer Gu)，这是我的新网站。
 
 上面这些是这个网站必须具备的要素。总的来说就是利用常规前端框架来搭建一个博客系统，这样一切都可以由我掌控了！
 
-具体的搭建过程我也许会另外写一篇文章来详细说明。实际上，在整个寻找的过程中，我发现已经有大佬这样做了。[Anthony Fu](https://github.com/antfu) 的个人网站 <code>[antfu.me/](https://antfu.me/)</code> 即是用这样的思路构建，这让我省了不少时间（😊 又可以白嫖不少轮子了～）。
+具体的搭建过程我也许会另外写一篇文章来详细说明。实际上，在整个寻找的过程中，我发现已经有大佬这样做了。[Anthony Fu](https://github.com/antfu) 的个人网站 <code>[antfu.me](https://antfu.me/)</code> 即是用这样的思路构建，这让我省了不少时间（😊 又可以白嫖不少轮子了～）。
 
 在接下来的时间里，我会将过去的一些文章资料慢慢的整理到这里来，当然，我也会写新的文章，分享更多的信息。
 

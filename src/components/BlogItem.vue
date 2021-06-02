@@ -2,10 +2,10 @@
     <div class="title text-lg blog-item">
         {{ frontmatter.title }}
         <sup
-            v-for="tag in tags"
+            v-if="titleBadge"
             class="text-xs border border-current rounded px-1 pb-0.2 ml-1"
-            :style="{ borderColor: tag.color, color: tag.color }"
-        >{{ tag.name }}</sup>
+            :style="{ borderColor: titleBadge.color, color: titleBadge.color }"
+        >{{ titleBadge.name }}</sup>
     </div>
     <div class="time opacity-80 text-sm -mt-1">
         {{ formatDate(frontmatter.date) }}
@@ -27,36 +27,16 @@ const props = defineProps<{
 
 const frontmatter = computed(() => (props.route.meta as any).frontmatter);
 
-const tags = computed(() => {
-    let tags = []
-    if (frontmatter.value.lang === 'zh') {
-        tags.push({
-            name: 'zh',
-            color: 'currentcolor'
-        });
-    }
-
-    if (frontmatter.value.tags) {
-        let colors: string[] = [];
-        if (frontmatter.value.tagsColor) {
-            colors = frontmatter.value.tagsColor.split(',');
+const titleBadge = computed(() => {
+    let { badge, badgeColor } = frontmatter.value;
+    console.log(badge, badgeColor)
+    if (badge) {
+        return {
+            name: badge.trim(),
+            color: badgeColor ? `${badgeColor.trim()}` : 'currentcolor'
         }
-
-        frontmatter.value.tags.split(',').forEach((e: any, i: number) => {
-            tags.push({
-                name: e.trim(),
-                color: colors[i] ? `#${colors[i].trim()}` : 'currentcolor'
-            })
-        });
     }
 
-    return tags
+    return null
 })
-
 </script>
-
-<style>
-.blog-item sup:first-child {
-    margin-left: 0;
-}
-</style>

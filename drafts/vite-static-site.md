@@ -12,8 +12,9 @@ duration: 20min
 
 所以这篇文章更应该看作是对 [antfu.me](https://antfu.me/) 这个网站的解读。在这里再次感谢 [Anthony Fu](https://github.com/antfu) 为我们带来了众多有意思的项目 🎉。
 
-> 前置知识：
-> 前端工程化 (Nodejs, npm...)，Vue.js (最好 >= 3.0)，TypeScript，基本的 markdown 编写能力
+<blockquote>
+前置知识：前端工程化 (Nodejs, npm...)，Vue.js (最好 >= 3.0)，TypeScript，基本的 markdown 编写能力。
+</blockquote>
 
 ## 我们需要做什么？
 
@@ -72,5 +73,103 @@ $ npm install vite-plugin-pages -D
 $ npm install vue-router@next
 
 # 配置该插件需要用到的辅助库
-$ npm install @types/fs-extra @types/node gray-matter -D
+$ npm install @types/fs-extra @types/node fs-extra gray-matter -D
 ```
+
+接下来我们来完成 vite-plugin-pages 的配置：
+
+```ts
+// vite.config.ts (以下为该插件的配置，不包括其他插件的配置)
+// ...
+import VitePages from "vite-plugin-pages";
+import { resolve } from "path";
+import fs from "fs-extra";
+import matter from "gray-matter";
+
+// plugins settings
+VitePages({
+  extensions: ["vue", "md"],
+  pagesDir: "pages",
+  extendRoute(route) {
+    const path = resolve(__dirname, route.component.slice(1));
+    const md = fs.readFileSync(path, "utf-8");
+    const { data } = matter(md);
+    route.meta = Object.assign(route.meta || {}, { frontmatter: data });
+
+    return route;
+  },
+}),
+```
+
+- `extensions`：需要包含的文件类型，这里显然是 `.vue` 和 `.md` 文件。
+- `pagesDir`：寻找文件的目录，这里选择了项目根目录下的 `pages` 目录。
+- `extendRoute`：提供一个方法，对每个文件产生路由做一些加工，这里是对 `route.meta` 的处理。
+- `matter`：<code>[gray-matter](https://github.com/jonschlinkert/gray-matter)</code> 的功能，可以获取相关文件中的 `front-matter`，并将其处理为一个对象。
+- `front-matter`：markdown 文件顶部，由 `---` 包裹的一块区域，就像：
+  ```md
+  ---
+  title: Hello
+  date: 2021-06-02
+  ---
+  ```
+
+总结就是，vite-plugin-pages 会自动把 `pages` 目录中的 `.vue` 和 `.md` 文件生成对应的路由，并且我们可以利用 markdown 的 `front-matter` 来为路由提供一些额外信息。
+
+然后我们来修改一下项目中的一些文件，让它们的功能和结构符合当前的插件配置。
+
+为了让路由在 app 中生效，我们需要创建一个`router`，并让 app use 。修改 `src/main.ts`：
+
+```ts
+// src/main.ts
+import App from "./App.vue";
+import { createApp } from "vue";
+import routes from "pages-generated"; // vite-plugin-pages 生成的路由信息
+import { createRouter, createWebHistory } from "vue-router";
+
+const app = createApp(App);
+app.use(
+  createRouter({
+    history: createWebHistory(),
+    routes,
+  })
+);
+
+app.mount("#app");
+```
+
+<blockquote>
+Note: 在 TS 中，直接从 `pages-generated` 导入会引起类型错误，需要在 `tsconfig.json` 的 `compilerOptions.types` 数组中加入 `vite-plugin-pages/client` 来加载对应的声明文件。
+</blockquote>
+
+`App.vue` 文件也需要进行修改，我们可以删除自动生成的所有代码，然后添加一个简单:
+
+```html
+<!-- src/App.vue -->
+<template>
+  <router-view />
+</template>
+```
+
+还缺少一些页面，我们在项目根目录下创建 `pages` 文件夹，并在里面创建一个 `index.vue` 文件作为 homepage，再创建一个 `foo.vue` 作为测试页面：
+
+```html
+<!-- pages/index.vue -->
+<template>
+  <div>Hello, Vite</div>
+</template>
+
+<!-- pages/foo.vue -->
+<template>
+  <div>foo</div>
+</template>
+```
+
+上面的这些操作其实就和我们构建一个常规的 Vue 项目一样。现在我们可以运行一下网站：
+
+```bash
+$ npm run dev
+```
+
+你可以在浏览器中看到我们设置的首页。在地址栏中添加 `/foo` 可以跳转到 foo 页面。
+
+~~基于文件系统的 <tabler-route /> 路由~~

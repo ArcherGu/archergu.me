@@ -1,16 +1,10 @@
 ---
 title: 用 Vite 构建静态网站
-date: 2021-06-02T06:00:00.000+00:00
+date: 2021-06-03T06:00:00.000+00:00
 tags: ["Vite"]
 tagsColor: ["#ba38fe"]
 duration: 20min
 ---
-
-这篇文章主要将介绍本网站的构成。从标题看这似乎是一篇教程文章，实际上我觉得它更像是一篇源码分析类的文章。
-
-就像 [我的新网站](/posts/my-new-site) 中说的，[Anthony Fu](https://github.com/antfu) 大佬的个人网站项目给了我很多指引。
-
-所以这篇文章更应该看作是对 [antfu.me](https://antfu.me/) 这个网站的解读。在这里再次感谢 [Anthony Fu](https://github.com/antfu) 为我们带来了众多有意思的项目 🎉。
 
 <blockquote>
 前置知识：前端工程化 (Nodejs, npm...)，Vue.js (最好 >= 3.0)，TypeScript，基本的 markdown 编写能力。
@@ -24,7 +18,7 @@ duration: 20min
 
 - 基于 <vscode-icons-file-type-vite /> [Vite.js](https://vitejs.dev/) 和 <vscode-icons-file-type-vue /> [Vue.js - 3.0](https://v3.vuejs.org/)，支持 <vscode-icons-file-type-typescript-official /> [TypeScript](https://www.typescriptlang.org/)
 - 基于文件系统的 <tabler-route /> 路由
-- 支持 <ri-markdown-line /> Markdown, 可以在 Markdown 中使用 Vue 组件
+- 支持 <ri-markdown-line /> Markdown 组件, 可以在 Markdown 中使用 Vue 组件
 - 纯粹的 <bx-bxs-file-html /> 静态页面，支持 <uil-server /> 服务端生成
 
 后面我就对上面的技术点进行说明，在此过程中也会穿插一些细节内容。
@@ -87,18 +81,23 @@ import fs from "fs-extra";
 import matter from "gray-matter";
 
 // plugins settings
-VitePages({
-  extensions: ["vue", "md"],
-  pagesDir: "pages",
-  extendRoute(route) {
-    const path = resolve(__dirname, route.component.slice(1));
-    const md = fs.readFileSync(path, "utf-8");
-    const { data } = matter(md);
-    route.meta = Object.assign(route.meta || {}, { frontmatter: data });
+export default defineConfig({
+  plugins: [
+    //...
+    VitePages({
+      extensions: ["vue", "md"],
+      pagesDir: "pages",
+      extendRoute(route) {
+        const path = resolve(__dirname, route.component.slice(1));
+        const md = fs.readFileSync(path, "utf-8");
+        const { data } = matter(md);
+        route.meta = Object.assign(route.meta || {}, { frontmatter: data });
 
-    return route;
-  },
-}),
+        return route;
+      },
+    }),
+  ],
+});
 ```
 
 - `extensions`：需要包含的文件类型，这里显然是 `.vue` 和 `.md` 文件。
@@ -173,3 +172,141 @@ $ npm run dev
 你可以在浏览器中看到我们设置的首页。在地址栏中添加 `/foo` 可以跳转到 foo 页面。
 
 ~~基于文件系统的 <tabler-route /> 路由~~
+
+## 支持 Markdown
+
+完成上面的 vite-plugin-pages 插件配置后，也许你尝试在 `pages` 目录下创建一个 `.md` 文件的页面，但是却发现尽管路由生成了，但是页面却无法显示，因为目前这个静态网站生成器还缺少 markdown 的支持。
+
+<code>[vite-plugin-md](https://github.com/antfu/vite-plugin-md)</code> 为 Vite 提供了将 markdown 当作 Vue 组件使用的功能，也可以在 markdown 中使用 Vue 组件。安装该插件：
+
+```bash
+$ npm i vite-plugin-md -D
+```
+
+然后配置一下:
+
+```ts
+// vite.config.ts (以下为该插件的配置，不包括其他插件的配置)
+// ...
+import ViteMarkdown from "vite-plugin-md";
+
+// plugins settings
+export default defineConfig({
+  plugins: [
+    //...
+    ViteMarkdown(),
+  ],
+});
+```
+
+现在我们就可以在 `pages` 目录下创建一个 `bar.md` 来尝试一下了：
+
+```md
+<!-- pages/bar.md -->
+
+# Hi, Markdown
+
+This is a markdown page.
+```
+
+重启项目后，在浏览器地址栏里添加 `/bar`，就可以看到这个 markdown 页面了。
+
+不是说还可以在 markdown 文件中使用 Vue 组件吗？那么现在，在`src/components` 下建立一个 Vue 组件，比如叫 `MyComponent.vue`：
+
+```html
+<!-- src/components/MyComponent.vue -->
+<template>
+  <div>This is a Vue component.</div>
+</template>
+```
+
+然后我们把该组件加入到 `pages/bar.md` 中:
+
+```diff md
+<!-- pages/bar.md -->
+
+# Hi, Markdown
+
+This is a markdown page.
+
++ <MyComponent />
+```
+
+重启项目，什么都没有发生 😅。这是因为 markdown 中我们没法像 js/ts 那样将组件 import 进来，所以除非这个组件被全局注册，否则无法直接使用。
+
+这里又有一个 <code>[vite-plugin-components](https://github.com/antfu/vite-plugin-md)</code> 插件可以帮我们解决问题，这个插件提供了组件自动导入功能（ vite-plugin-md 实际上是对 markdown 进行了 html 转换处理，所以在 markdown 中使用了组件，也可以获得 vite-plugin-components 的支持）。配置一下插件：
+
+```ts
+// vite.config.ts (以下为该插件的配置，不包括其他插件的配置)
+// ...
+import ViteComponents from "vite-plugin-components";
+
+// plugins settings
+export default defineConfig({
+  plugins: [
+    //...
+    ViteComponents({
+      extensions: ["vue", "md"],
+      customLoaderMatcher: (path) => path.endsWith(".md"),
+    }),
+  ],
+});
+```
+
+重启项目，此时 `MyComponent` 组件已经正确的显示了！
+
+~~支持 <ri-markdown-line /> Markdown 组件, 可以在 Markdown 中使用 Vue 组件~~
+
+## 静态页面生成
+
+完成上面的 Vite 插件配置后其实已经是一个具有基本功能的网站了，你完全可以按照常规的开发模式来构建自己的页面。但是这里我们还需要完成静态页面的生成，这样当你创作内容并发布后，搜索引擎也许会记录到一些信息（SEO 优化）。
+
+[Anthony Fu](https://github.com/antfu) 大佬为我们提供了一个静态页面生成器（SSG，server-side generation）—— [vite-ssg](https://github.com/antfu/vite-ssg)。使用这个工具，我们可以在 `build` 项目时将页面打包成一个个的静态页面。
+
+安装 vite-ssg：
+
+```bash
+$ npm install vite-ssg -D
+# 使用 vite-ssg 需要的依赖
+$ npm install @vueuse/head -S
+$ npm install @vue/server-renderer -D
+```
+
+接下来，我们修改一下项目的入口文件 `main.ts`：
+
+```ts
+// src/main.ts
+import App from "./App.vue";
+import routes from "pages-generated";
+import { ViteSSG } from "vite-ssg";
+
+// `export const createApp` is required
+export const createApp = ViteSSG(App, { routes });
+```
+
+然后我们也需要修改一下 `package.json` 中的 `scripts`：
+
+```diff
+  "scripts": {
+    "dev": "vite",
+-   "build": "vue-tsc --noEmit && vite build",
++   "build": "vite-ssg build",
+    "serve": "vite preview"
+  },
+```
+
+用 `dev` 模式重启一下项目，应该没有啥问题。然后我们执行下 `build`：
+
+```bash
+$ npm run build
+```
+
+项目自动进行打包，输出目录默认是根目录下的 `dist` 文件夹。你会发现，这个打包的结果和常规的 vue-cli 或者 Vite 项目打包的结果不同，它将页面都转换成了的 `.html` 静态页面文件。这样我们在部署网站时，搜索引擎将尽可能的收集我们创作的内容。
+
+~~纯粹的 <bx-bxs-file-html /> 静态页面，支持 <uil-server /> 服务端生成~~
+
+## 最后说的话
+
+这是一个基础的 Vite 静态页面生成器，我们可以利用它来构建各种有趣的项目，你可以在 <code>[vite-static-site](https://github.com/ArcherGu/vite-static-site)</code> 找到本文所记录的源码。
+
+它的整体思路都来自于 [Anthony Fu](https://github.com/antfu) 的 <code>[antfu.me](https://github.com/antfu/antfu.me)</code> 和 <code>[vitesse](https://github.com/antfu/vitesse)</code>。实际上前文提到的大部分插件和工具都是 Anthony Fu 创造并维护的，感谢他为我们带来了这些有趣的项目。🎉

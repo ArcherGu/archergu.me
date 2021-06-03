@@ -19,7 +19,7 @@ Hi！我是顾不上 (Archer Gu)，这是我的新网站。
 
 - 基于 <vscode-icons-file-type-vite /> [Vite.js](https://vitejs.dev/) 和 <vscode-icons-file-type-vue /> [Vue.js - 3.0](https://v3.vuejs.org/)，支持 <vscode-icons-file-type-typescript-official /> [TypeScript](https://www.typescriptlang.org/)
 - 基于文件系统的 <tabler-route /> 路由
-- 支持 <ri-markdown-line /> Markdown, 可以在 Markdown 中使用 Vue 组件
+- 支持 <ri-markdown-line /> Markdown 组件, 可以在 Markdown 中使用 Vue 组件
 - 纯粹的 <bx-bxs-file-html /> 静态页面，支持 <uil-server /> 服务端生成
 
 上面这些是这个网站必须具备的要素。总的来说就是利用常规前端框架来搭建一个博客系统，这样一切都可以由我掌控了！

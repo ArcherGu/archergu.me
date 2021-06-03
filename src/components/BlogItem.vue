@@ -29,7 +29,6 @@ const frontmatter = computed(() => (props.route.meta as any).frontmatter);
 
 const titleBadge = computed(() => {
     let { badge, badgeColor } = frontmatter.value;
-    console.log(badge, badgeColor)
     if (badge) {
         return {
             name: badge.trim(),

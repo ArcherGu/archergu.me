@@ -222,7 +222,7 @@ This is a markdown page.
 
 然后我们把该组件加入到 `pages/bar.md` 中:
 
-```diff md
+```diff
 <!-- pages/bar.md -->
 
 # Hi, Markdown
@@ -310,3 +310,5 @@ $ npm run build
 这是一个基础的 Vite 静态页面生成器，我们可以利用它来构建各种有趣的项目，你可以在 <code>[vite-static-site](https://github.com/ArcherGu/vite-static-site)</code> 找到本文所记录的源码。
 
 它的整体思路都来自于 [Anthony Fu](https://github.com/antfu) 的 <code>[antfu.me](https://github.com/antfu/antfu.me)</code> 和 <code>[vitesse](https://github.com/antfu/vitesse)</code>。实际上前文提到的大部分插件和工具都是 Anthony Fu 创造并维护的，感谢他为我们带来了这些有趣的项目。🎉
+
+> [知乎文章链接](https://zhuanlan.zhihu.com/p/377593594)

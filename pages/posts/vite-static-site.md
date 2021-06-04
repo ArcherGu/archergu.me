@@ -1,8 +1,8 @@
 ---
 title: 用 Vite 构建静态网站
 date: 2021-06-03T06:00:00.000+00:00
-tags: ["Vite"]
-tagsColor: ["#ba38fe"]
+tags: ["Vite", "技术分享"]
+tagsColor: ["#ba38fe", "#268785"]
 duration: 20min
 ---
 

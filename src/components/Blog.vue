@@ -1,12 +1,20 @@
 <template>
     <div v-if="frontmatter.display ?? frontmatter.title" class="prose m-auto mb-8">
         <h1 class="mb-0">{{ frontmatter.display ?? frontmatter.title }}</h1>
+
         <p v-if="frontmatter.date" class="opacity-60 !-mt-2">
             {{ formatDate(frontmatter.date) }}
             <span
                 v-if="frontmatter.duration"
             >· {{ frontmatter.duration }}</span>
         </p>
+
+        <span
+            v-for="tag in tags"
+            class="text-md border border-current rounded px-1 pb-0.2 mb-0 mr-1"
+            :style="{ borderColor: tag.color, color: tag.color }"
+        >{{ tag.name }}</span>
+
         <p v-if="frontmatter.subtitle" class="opacity-70 !-mt-6 italic">{{ frontmatter.subtitle }}</p>
     </div>
     <slot />
@@ -19,7 +27,7 @@
 </template>
 
 <script setup lang='ts'>
-import { defineProps, onMounted } from 'vue'
+import { computed, defineProps, onMounted } from 'vue'
 import { formatDate } from '@/utils'
 import { useRoute } from 'vue-router'
 import { useEventListener, isClient } from '@vueuse/core'
@@ -27,19 +35,19 @@ import { useEventListener, isClient } from '@vueuse/core'
 const route = useRoute()
 const { frontmatter } = defineProps<{ frontmatter: any }>()
 
-// const tags = computed(() => {
-//     let { tags, tagsColor } = frontmatter.value;
-//     if (tags && Array.isArray(tags)) {
-//         tagsColor = Array.isArray(tagsColor) ? tagsColor : [];
+const tags = computed(() => {
+    let { tags, tagsColor } = frontmatter;
+    if (tags && Array.isArray(tags)) {
+        tagsColor = Array.isArray(tagsColor) ? tagsColor : [];
 
-//         return tags.map((e: any, i: number) => ({
-//             name: e.trim(),
-//             color: tagsColor[i] ? `${tagsColor[i].trim()}` : 'currentcolor'
-//         }))
-//     }
+        return tags.map((e: any, i: number) => ({
+            name: e.trim(),
+            color: tagsColor[i] ? `${tagsColor[i].trim()}` : 'currentcolor'
+        }))
+    }
 
-//     return []
-// })
+    return []
+})
 
 if (isClient) {
     const navigate = () => {

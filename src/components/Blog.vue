@@ -2,18 +2,20 @@
     <div v-if="frontmatter.display ?? frontmatter.title" class="prose m-auto mb-8">
         <h1 class="mb-0">{{ frontmatter.display ?? frontmatter.title }}</h1>
 
+        <p v-if="tags && tags.length > 0">
+            <span
+                v-for="tag in tags"
+                class="text-md border border-current rounded px-1 pb-0.2 mb-0 mr-1"
+                :style="{ borderColor: tag.color, color: tag.color }"
+            >{{ tag.name }}</span>
+        </p>
+
         <p v-if="frontmatter.date" class="opacity-60 !-mt-2">
             {{ formatDate(frontmatter.date) }}
             <span
                 v-if="frontmatter.duration"
             >· {{ frontmatter.duration }}</span>
         </p>
-
-        <span
-            v-for="tag in tags"
-            class="text-md border border-current rounded px-1 pb-0.2 mb-0 mr-1"
-            :style="{ borderColor: tag.color, color: tag.color }"
-        >{{ tag.name }}</span>
 
         <p v-if="frontmatter.subtitle" class="opacity-70 !-mt-6 italic">{{ frontmatter.subtitle }}</p>
     </div>

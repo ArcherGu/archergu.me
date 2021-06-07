@@ -5,7 +5,7 @@ tags: ["QT", "技术分享"]
 tagsColor: ["#41cd52", "#268785"]
 badge: History
 badgeColor: "#E87A90"
-duration: 20min
+duration: 10min
 ---
 
 <blockquote>

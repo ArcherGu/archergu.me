@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "vite --port 3333 --open",
         "build": "cross-env NODE_ENV=production vite-ssg build",
-        "preview": "vite preview"
+        "serve": "vite preview"
     },
     "dependencies": {
         "@antv/g2plot": "^2.3.21",

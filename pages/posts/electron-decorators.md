@@ -1,9 +1,9 @@
 ---
 title: 用装饰器给 Electron 提供一个基础框架
-date: 2021-08-03T06:00:00.000+00:00
+date: 2021-08-04T06:00:00.000+00:00
 tags: ['Electron', '装饰器', '技术分享']
 tagsColor: ['#74b1be', '#D0104C', '#268785']
-duration: 10min
+duration: 30min
 ---
 
 <blockquote>
@@ -168,11 +168,92 @@ for (const ControllerClass of controllers) {
 ```
 这样，通过 `@Controller` 和 `@Injectable` 装饰器，就完成了 Controller 的实例化，并将它们所依赖的 Services 成功注入。
 
+### IpcInvoke 装饰器
 
+解决了 Controller 的实例化问题，接下来，需要解决 ipcMain 监听 ipcRenderer 消息，绑定对应的处理函数的问题了。同样，我们需要设计一个 `@IpcInvoke` 的装饰器:
+```ts
+export function IpcInvoke(event: string): MethodDecorator {
+    return (target: any, propertyName: string) => {
+        Reflect.defineMetadata('ipc-invoke', event, target, propertyName);
+    };
+}
+```
+这是一个方法装饰器，定义了一个 `ipc-invoke` 的键用于存放消息事件的名称。接下来是具体的使用方法:
+```ts
+const controller = factory(ControllerClass);
+const proto = ControllerClass.prototype;
+const funcs = Object.getOwnPropertyNames(proto).filter(
+    (item) => typeof controller[item] === 'function' && item !== 'constructor'
+);
 
+funcs.forEach((funcName) => {
+    let event: string | null = null;
+    event = Reflect.getMetadata('ipc-invoke', proto, funcName);
+    if (event) {
+        ipcMain.handle(event, async (e, ...args) => {
+            try {
+                const result = await controller[funcName].call(controller, ...args);
 
+                return {
+                    data: result,
+                };
+            } catch (error) {
+                console.log(error);
+                return {
+                    error: error,
+                };
+            }
+        });
+    }
+});
+```
+上面的代码中:
+- 完成 Controller 的实例化，这里是接上面的 Controller 实例化相关的部分。
+- 获取这个 Controller 的成员，判断成员是否是函数，并且不是构造函数。
+- 从元数据集中的 `ipc-invoke` 键获取具体的事件名称，如果存在事件名称，则进行绑定。
+- 通过 `ipcMain.handle` 来将具体的函数和事件绑定在一起。
 
+通过这样操作，我们在 Controller 实例化以后，顺便对其中的方法进行了判断，如果被 `@IpcInvoke` 装饰器装饰了，则自动对其进行事件绑定。
 
+装饰器具体的使用代码如下:
+```ts
+// MyController.ts
+@Controller()
+export class MyController {
+    constructor(
+        private myService: MyService
+    ) { }
+
+    @IpcInvoke(EVENTS.SEND_MSG)
+    public async handleSendMsg(msg: string): Promise<string> {
+        return this.myService.reply();
+    }
+}
+
+// MyService.ts
+@Injectable('MyService')
+export class MyService {
+    constructor() { /* do nothing */ }
+
+    public reply(): string {
+        return 'Hello! Renderer Process!';
+    }
+}
+```
+
+## 总结
+
+经过了装饰器的改造之后，我们的 Electron 主进程看上去就像一个后端 api 服务一样，而渲染进程调用 api 的方式也如同常规 Web 项目一般。假设在未来某一天，这个项目需要改造成 B/S 架构，我们只需要拆掉 Electron，将前端的 api 调用其进行跟换，为它换上一个后端就行了。
+
+这里有一个小的项目模板可供参考: [fast-vite-electron](https://github.com/ArcherGu/fast-vite-electron)。
+
+这个模板中，渲染进程使用 vite 开发，主进程使用 esbuild 构建，编译速度非常的快，如果想了解其中的细节，可以看我的另外一篇文章 [「极速DX Vite + Electron + esbuild」](https://archergu.me/posts/vite-electron-esbuild)。
+
+看到这里，也许有朋友会想，如果我未来需要一个 node.js 后端...
+
+这里有一个项目模板: [fast-vite-nestjs-electron](https://github.com/ArcherGu/fast-vite-nestjs-electron)。
+
+这个模板集成了 [nest.js](https://nestjs.com/)，如果需要，将 nest.js 拆出来，稍加修改，就是一个可用的 node.js 后端了。回头有时间我可用写一篇文章具体的介绍一下这个集成的过程。
 
 ## References
 

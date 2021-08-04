@@ -1,5 +1,5 @@
 ---
-title: 用装饰器给 Electron 提供一个基础框架
+title: 用装饰器给 Electron 提供一个基础 API 框架
 date: 2021-08-04T06:00:00.000+00:00
 tags: ['Electron', '装饰器', '技术分享']
 tagsColor: ['#74b1be', '#D0104C', '#268785']

@@ -243,7 +243,7 @@ export class MyService {
 
 ## 总结
 
-经过了装饰器的改造之后，我们的 Electron 主进程看上去就像一个后端 api 服务一样，而渲染进程调用 api 的方式也如同常规 Web 项目一般。假设在未来某一天，这个项目需要改造成 B/S 架构，我们只需要拆掉 Electron，将前端的 api 调用其进行跟换，为它换上一个后端就行了。
+经过了装饰器的改造之后，我们的 Electron 主进程看上去就像一个后端 api 服务一样，而渲染进程调用 api 的方式也如同常规 Web 项目一般。假设在未来某一天，这个项目需要改造成 B/S 架构，我们只需要拆掉 Electron，将前端的 api 调用器跟换，并换上一个后端就行了。
 
 这里有一个小的项目模板可供参考: [fast-vite-electron](https://github.com/ArcherGu/fast-vite-electron)。
 

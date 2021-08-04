@@ -99,17 +99,85 @@ npm i reflect-metadata --save
 // main.ts
 import 'reflect-metadata';
 ```
-
-### 设计装饰器
-
 理解了装饰器和元数据的概念，以及引入两者的准备工作后，接下来就需要设计一些装饰器。
 
-施工中...
+
+### Controller 装饰器和 Injectable 装饰器
+
+首先需要解决 Controller 的实例化，这里可以设计一个名为 `@Controller` 的类装饰器:
+```ts
+export function Controller(): ClassDecorator {
+    return (target: object) => {
+        // do nothing
+    };
+}
+```
+可以看到这个装饰器什么都没有做，只是定义了一个装饰器工厂函数，返回了一个空的类装饰器，为什么这样做呢？当我们使用装饰器时，reflect-metadata 会自动为所装饰的 target 添加上几个默认的元数据信息[<sup>[2]</sup>](#refer-1):
+<blockquote>
+
+- 当我们为类使用装饰器时，只会为类添加上 ”design:paramtypes” 的元数据信息，含义为其构造函数的传入参数的类型数组
+
+- 当我们为类中的属性使用装饰器时，只会为该属性添加上 ”design:type” 的元数据，含义为该属性的类型
+
+- 当我们为类中的方法使用装饰器时，会为该属性添加上所有三种保留元数据键，含义分别为方法的类型，传入该方法的形参类型数组，该方法的返回值的类型
+
+</blockquote>
+
+当我们把 `@Controller` 类装饰器放在某个具体的 Controller 上时，就可以在元数据集中获取到这个 Controller 的构造函数的入参类型数组，获取构造函数的入参类型有什么用呢？熟悉后端的朋友应该已经想到了，我们可以做 **依赖注入**，因为 Controller 往往会使用一些 Services 来处理具体的业务，而 Services 又有可能在一些 Controllers 之间共享。所以获取 Controller 构造函数的入参类型，可以便于我们实例化这些 Services，然后在 Controllers 实例化时注入到它们内部以供使用。
+
+为此，又需要设计一个新的装饰器，这个装饰器用来装饰那些需要注入的 Services:
+```ts
+export function Injectable(name: string): ClassDecorator {
+    return (target: object) => {
+        Reflect.defineMetadata('name', name, target);
+    };
+}
+```
+`@Injectable` 定义了一个 `name` 键用来存放注入项的名称，用于区分各个注入项。另外，作为一个类装饰器，它同样会将注入项的构造函数存入元数据集中。
+
+接下来，就是具体的 Controller 实例化过程。首先，我们需要定义一个数组，将 Controllers 放在其中：
+```ts
+const controllers = [ MyController ];
+```
+然后定义一个工厂函数用来自动实例化这些 Controllers 和 Services:
+```ts
+const ExistInjectable = {};
+function factory(constructor) {
+    const paramtypes = Reflect.getMetadata('design:paramtypes', constructor);
+
+    const services = paramtypes.map((service) => {
+        const name = Reflect.getMetadata('name', service);
+        const item = ExistInjectable[name] || factory(service);
+        ExistInjectable[name] = item;
+        return item;
+    });
+
+    return new constructor(...services);
+}
+```
+上面的代码中:
+- 从元数据集中获取到这个类的构造函数入参信息
+- 遍历入参，从元数据集中获取对应的 `name` 的信息，如果改注入项已经存在，则直接从 `ExistInjectable` 中获取，如果未存在，则递归到工厂函数进行实例化，然后存入 `ExistInjectable`。
+- 将这些已经完成实例化的入参传入构造函数实例化类。
+  
+Controller 实例化:
+```ts
+for (const ControllerClass of controllers) {
+    const controller = factory(ControllerClass);
+}
+```
+这样，通过 `@Controller` 和 `@Injectable` 装饰器，就完成了 Controller 的实例化，并将它们所依赖的 Services 成功注入。
+
+
+
+
+
+
 
 ## References
 
 <div id="refer-1">
 
-- [1] [「程序猿同事的分享」TypeScript 元数据的理解与使用](https://zhuanlan.zhihu.com/p/166362122)
+- [1][2] [「程序猿同事的分享」TypeScript 元数据的理解与使用](https://zhuanlan.zhihu.com/p/166362122)
 
 </div>

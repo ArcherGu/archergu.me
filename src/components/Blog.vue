@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, defineProps, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { formatDate } from '@/utils'
 import { useRoute } from 'vue-router'
 import { useEventListener, isClient } from '@vueuse/core'

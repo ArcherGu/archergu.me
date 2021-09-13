@@ -36,14 +36,14 @@ watch(wordCloudRef, () => {
     const el = unrefElement(wordCloudRef);
     if (!el) return;
 
-    wordCloud = new WordCloud(el, {
+    wordCloud = new WordCloud(el as HTMLElement, {
         data: [],
         autoFit: true,
         height: width.value < 640 ? 500 : 600,
         wordField: "keyword",
         weightField: "weight",
         colorField: "color",
-        color: ({ color }) => color,
+        color: ({ color }) => color || "white",
         wordStyle: {
             fontFamily: "Dosis",
             fontSize: [20, width.value < 640 ? 40 : 50],
@@ -115,4 +115,5 @@ watch(
 );
 </script>
 
-<style></style>
+<style>
+</style>

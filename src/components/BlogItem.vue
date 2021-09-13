@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { formatDate } from "@/utils";
-import { computed, defineProps } from "vue";
+import { computed } from "vue";
 import type { RouteRecordNormalized } from "vue-router";
 
 const props = defineProps<{

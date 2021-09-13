@@ -22,6 +22,15 @@ export default defineConfig({
             '@/': `${resolve(__dirname, 'src')}/`,
         },
     },
+    optimizeDeps: {
+        include: [
+            'vue',
+            'vue-router',
+            '@vueuse/core',
+            'dayjs',
+            'dayjs/plugin/localizedFormat',
+        ],
+    },
     plugins: [
         ViteVue({
             include: [/\.vue$/, /\.md$/],
@@ -54,10 +63,10 @@ export default defineConfig({
                 md.use(Prism);
                 md.use(anchor, {
                     slugify,
-                    permalink: true,
-                    permalinkBefore: true,
-                    permalinkSymbol: '#',
-                    permalinkAttrs: () => ({ 'aria-hidden': true }),
+                    permalink: anchor.permalink.linkInsideHeader({
+                        symbol: '#',
+                        placement: 'before',
+                    })
                 });
 
                 md.use(markdownAttr, {

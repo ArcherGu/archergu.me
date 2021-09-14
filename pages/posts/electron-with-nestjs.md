@@ -143,7 +143,94 @@ export class ElectronIpcTransport extends Server implements CustomTransportStrat
 
 ## 创建实例和 window 模块
 
-未完待续
+完成上面的微服务传输器和相关的装饰器以后，我们就可以继续来创建应用实例了:
+```ts
+async function bootstrap() {
+    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+        AppModule,
+        {
+            strategy: new ElectronIpcTransport(),
+        },
+    );
+
+    await app.listen();
+}
+```
+我们使用工厂函数创建一个微服务，包含app module（默认module），使用 Electron IPC 的传输器策略，然后通过 `listen()` 方法将各个事件方法注册到 IPC 通道。
+
+到这里为止，我们只是启动了 Nest.js 的框架，以及相关通信方法的注册，而 Electron 的主窗口还没有启动。Electron 的主窗口可以选择在 `bootstrap()` 启动方法里进行创建，但是我这里习惯将其作为一个 module 来启动，在 `src/main/global` 目录下，新建一个 `win.module.ts` 文件:
+```ts
+// win.module.ts
+import { Module } from '@nestjs/common';
+import { app, BrowserWindow } from 'electron';
+import { join } from 'path';
+
+@Module({
+    providers: [{
+        provide: 'WEB_CONTENTS',
+        async useFactory() {
+            app.on('window-all-closed', () => {
+                if (process.platform !== 'darwin') {
+                    app.quit();
+                }
+            });
+
+            await app.whenReady();
+
+            const win = new BrowserWindow({
+                width: 1000,
+                height: 800,
+                webPreferences: {
+                    nodeIntegration: true,
+                    webSecurity: false,
+                    contextIsolation: false,
+                },
+            });
+
+            win.maximize();
+
+            const URL = !app.isPackaged
+                ? `http://localhost:${process.env.PORT}`
+                : `file://${join(app.getAppPath(), 'dist/render/index.html')}`;
+
+            win.loadURL(URL);
+
+            win.on('closed', () => {
+                win.destroy();
+            });
+
+            return win.webContents;
+        }
+    }],
+    exports: ['WEB_CONTENTS']
+})
+export class WinModule { }
+```
+为什么将窗口作为一个 module ？上面的代码中可以发现，我在 `providers` 中使用工厂函数创建窗口，顺便将窗口的 `webContents` 提供了出来作为 “WEB_CONTENTS” 提供项，这样一来，我们不仅仅创建了窗口，还将这个窗口的 `webContents` 作为一个提供项可以在项目的其他 module 中进行注入，就可以在其他的 module 中使用 `webContents` 向该窗口的渲染进程发送消息了。
+
+如此一来，我们不但通过 Electron IPC 传输器完成了类似于“请求/回复”的后端 API 结构，也完成了像 WebSocket 那样可以主动让主进程（后端）推送消息给渲染进程（前端）的方法。
+
+最后，只要将这个 `WinModule` 导入到 `AppModule` 中，当 Nest.js 框架启动后，窗口也将进行创建，整个 Electron 应用就启动了:
+```ts
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { WinModule } from './global/win.module';
+
+@Module({
+    imports: [WinModule],
+    controllers: [AppController],
+    providers: [AppService],
+})
+export class AppModule { }
+```
+
+## 总结
+
+Electron 集成 Nest.js后，我们可以像写 Nest.js 后端那样来写其主进程，将主进程的功能结构整理的更加规范，也方便我们在后期的 C/S 到 B/S 过程中进行转换。
+
+本文的模板仓库是: [fast-vite-nestjs-electron](https://github.com/ArcherGu/fast-vite-nestjs-electron)
+
 
 
 ## References

@@ -123,7 +123,7 @@ export class ElectronIpcTransport extends Server implements CustomTransportStrat
         const handler: MessageHandler | undefined = this.messageHandlers.get(messageChannel);
         if (!handler) return;
 
-        const [ipcMainEventObject, payload] = args;
+        const [ipcMainEventObject, ...payload] = args;
         const data = (!payload || payload.length === 0) ? undefined : payload.length === 1 ? payload[0] : payload;
 
         const result = await handler(data, {

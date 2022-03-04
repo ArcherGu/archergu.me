@@ -1,129 +1,129 @@
 /* https://github.com/antfu/prism-theme-vars */
-@import "prism-theme-vars/base.css";
+@import 'prism-theme-vars/base.css';
 
 :root {
-  --prism-font-size: 0.9rem;
-  --prism-font-family: "Fira Code", monospace;
+    --prism-font-size: 0.9rem;
+    --prism-font-family: 'Fira Code', monospace;
 }
 
 :root {
-  --prism-font-family: "Input Mono", monospace;
+    --prism-font-family: 'Input Mono', monospace;
 }
 
 html:not(.dark) {
-  --prism-foreground: #393a34;
-  --prism-background: #ecebe4;
-  --prism-comment: #a0ada0;
-  --prism-string: #b56959;
-  --prism-literal: #2f8a89;
-  --prism-number: #296aa3;
-  --prism-keyword: #1c6b48;
-  --prism-function: #6c7834;
-  --prism-boolean: #1c6b48;
-  --prism-constant: #a65e2b;
-  --prism-deleted: #a14f55;
-  --prism-class: #2993a3;
-  --prism-builtin: #ab5959;
-  --prism-property: #b58451;
-  --prism-namespace: #b05a78;
-  --prism-punctuation: #8e8f8b;
-  --prism-decorator: #bd8f8f;
-  --prism-regex: #ab5e3f;
-  --prism-json-property: #698c96;
+    --prism-foreground: #393a34;
+    --prism-background: #ecebe4;
+    --prism-comment: #a0ada0;
+    --prism-string: #b56959;
+    --prism-literal: #2f8a89;
+    --prism-number: #296aa3;
+    --prism-keyword: #1c6b48;
+    --prism-function: #6c7834;
+    --prism-boolean: #1c6b48;
+    --prism-constant: #a65e2b;
+    --prism-deleted: #a14f55;
+    --prism-class: #2993a3;
+    --prism-builtin: #ab5959;
+    --prism-property: #b58451;
+    --prism-namespace: #b05a78;
+    --prism-punctuation: #8e8f8b;
+    --prism-decorator: #bd8f8f;
+    --prism-regex: #ab5e3f;
+    --prism-json-property: #698c96;
 }
 
 html.dark {
-  --prism-foreground: #d4cfbf;
-  --prism-background: #111111;
-  --prism-comment: #758575;
-  --prism-string: #d48372;
-  --prism-literal: #429988;
-  --prism-keyword: #4d9375;
-  --prism-boolean: #1c6b48;
-  --prism-number: #6394bf;
-  --prism-variable: #c2b36e;
-  --prism-function: #a1b567;
-  --prism-deleted: #a14f55;
-  --prism-class: #54b1bf;
-  --prism-builtin: #e0a569;
-  --prism-property: #dd8e6e;
-  --prism-namespace: #db889a;
-  --prism-punctuation: #858585;
-  --prism-decorator: #bd8f8f;
-  --prism-regex: #ab5e3f;
-  --prism-json-property: #6b8b9e;
-  --prism-line-number: #888888;
-  --prism-line-number-gutter: #eeeeee;
-  --prism-line-highlight-background: #444444;
-  --prism-selection-background: #444444;
+    --prism-foreground: #d4cfbf;
+    --prism-background: #111111;
+    --prism-comment: #758575;
+    --prism-string: #d48372;
+    --prism-literal: #429988;
+    --prism-keyword: #4d9375;
+    --prism-boolean: #1c6b48;
+    --prism-number: #6394bf;
+    --prism-variable: #c2b36e;
+    --prism-function: #a1b567;
+    --prism-deleted: #a14f55;
+    --prism-class: #54b1bf;
+    --prism-builtin: #e0a569;
+    --prism-property: #dd8e6e;
+    --prism-namespace: #db889a;
+    --prism-punctuation: #858585;
+    --prism-decorator: #bd8f8f;
+    --prism-regex: #ab5e3f;
+    --prism-json-property: #6b8b9e;
+    --prism-line-number: #888888;
+    --prism-line-number-gutter: #eeeeee;
+    --prism-line-highlight-background: #444444;
+    --prism-selection-background: #444444;
 }
 
 .prose {
-  --fg: #555;
-  --fg-deep: #222;
-  --fg-deeper: #000;
-  --link: #00aa90;
-  color: var(--fg);
-  max-width: 74ch;
+    --fg: #555;
+    --fg-deep: #222;
+    --fg-deeper: #000;
+    --link: #00aa90;
+    color: var(--fg);
+    max-width: 74ch;
 
-  a {
-    font-weight: inherit;
-    text-decoration: none;
-    border-bottom: 1px dotted rgba(125, 125, 125, 0.1);
-    transition: all 0.3s ease-in-out;
+    a {
+        font-weight: inherit;
+        text-decoration: none;
+        border-bottom: 1px dotted rgba(125, 125, 125, 0.1);
+        transition: all 0.3s ease-in-out;
 
-    &:hover {
-      color: var(--link);
-      border-bottom: 1px dotted var(--link);
+        &:hover {
+            color: var(--link);
+            border-bottom: 1px dotted var(--link);
+        }
     }
-  }
 
-  a code {
-    color: inherit;
-  }
+    a code {
+        color: inherit;
+    }
 
-  hr {
-    width: 50px;
-    margin: 2em auto;
-  }
+    hr {
+        width: 50px;
+        margin: 2em auto;
+    }
 }
 
 html.dark .prose {
-  --fg: #bbb;
-  --fg-deep: #ddd;
-  --fg-deeper: #fff;
-  --link: #33a6b8;
+    --fg: #bbb;
+    --fg-deep: #ddd;
+    --fg-deeper: #fff;
+    --link: #33a6b8;
 
-  a code {
-    color: inherit;
-  }
+    a code {
+        color: inherit;
+    }
 }
 
 a.item {
-  transition: 0.2s all ease-out;
-  text-decoration: none;
-  border-bottom: none !important;
-  opacity: 0.6;
+    transition: 0.2s all ease-out;
+    text-decoration: none;
+    border-bottom: none !important;
+    opacity: 0.6;
 
-  &:hover {
-    opacity: 1;
-  }
+    &:hover {
+        opacity: 1;
+    }
 }
 
 a.header-anchor {
-  float: left;
-  margin-top: 0.125em;
-  margin-left: -1.2em;
-  padding-right: 0.5em;
-  font-size: 0.85em;
-  opacity: 0;
-  text-decoration: none;
-  border: 0 !important;
+    float: left;
+    margin-top: 0.125em;
+    margin-left: -1.2em;
+    padding-right: 0.5em;
+    font-size: 0.85em;
+    opacity: 0;
+    text-decoration: none;
+    border: 0 !important;
 }
 
 a.header-anchor:hover,
 a.header-anchor:focus {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 h1:hover .header-anchor,
@@ -138,44 +138,49 @@ h5:hover .header-anchor,
 h5:focus .header-anchor,
 h6:hover .header-anchor,
 h6:focus .header-anchor {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 .prose blockquote {
-  font-weight: normal;
-  font-style: normal;
-  line-height: 1.5em;
-  padding: 0.6em 1.2em;
-  opacity: 0.8;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1.5em;
+    padding: 0.6em 1.2em;
+    opacity: 0.8;
 }
 
 .prose blockquote > :first-child {
-  margin-top: 0;
+    margin-top: 0;
 }
 .prose blockquote > :last-child {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .prose blockquote p:first-of-type::before {
-  content: none;
+    content: none;
 }
 
 .prose blockquote p:first-of-type::after {
-  content: none;
+    content: none;
 }
 
 .prose svg {
-  display: inline;
+    display: inline;
 }
 
 .prose > ul > li > *:first-child {
-  margin-top: auto;
+    margin-top: auto;
 }
 
 .prose > ul > li > *:last-child {
-  margin-bottom: auto;
+    margin-bottom: auto;
 }
 
 .prose img {
-  @apply rounded-2xl shadow-2xl;
+    @apply rounded-2xl shadow-2xl;
+}
+
+.prose img[title='teahouse-share'] {
+    max-width: 250px;
+    margin: 0 auto;
 }

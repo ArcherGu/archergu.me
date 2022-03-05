@@ -50,7 +50,7 @@ DIY 环节中，左侧的茶底 Tab 会收缩隐藏起来，取而代之的是�
 
 接下来，就是茶底了。茶底需要有一个波浪动画，我的思路是用 svg 画一个比茶杯大一些的矩形，然后矩形的顶部画成波浪线，这样就有了一个顶部是波浪形的封闭矩形了。接着通过 CSS 的 animation 给这个波浪矩形加一段横向的无限循环平移动画。在 svg 的外部增加一个 overflow: hidden 的容器，这个容器的尺寸限制在茶杯内部，即宽度需要减去茶杯左右的边框宽度，高度比茶杯高度适当小一点，这样茶就不会有即将溢出的样子了，通过绝对定位将这个茶底容器放在杯子里，适当调整定位符合实际情况。这样 svg 在容器里平移时超出的部分就不会显示出来，看上去就像茶杯里的液体在做波浪形的流体动画。至于茶底的颜色，则可以通过 svg 的 `<linearGradient>` 标签来设置，而且可以是带透明度的渐变色，让茶底看上去更加的逼真，为其绑定两个变量，用于不同茶底时切换不同的颜色。
 
-```vue
+```html
 <template>
     <div class="base-tea">
         <div class="wave-wrapper">
@@ -90,3 +90,63 @@ DIY 环节中，左侧的茶底 Tab 会收缩隐藏起来，取而代之的是�
 对于这个问题，我查找了`dom-to-image` 的一些 issues 以及网上的一些讨论话题，但是没有任何收获。而这个 `dom-to-image` 库本身也已经在几年前停止了维护，所以对目前的浏览器版本和标准肯定也存在一定的脱节。花了一些时间后，我决定不再此问题上继续钻牛角尖，必须换一个思路来解决问题。
 
 ## 另一个思路的第二版
+
+有了第一版的经验后，第二版设计时，我考虑到茶饮模型需要一种更加通用化的转变为图片的方式，另外，茶饮模型依然需要支持各种动画效果，自然而然我想到了 html5 的 `<canvas>`。Canvas 可以非常简单的将画布里的内容转化为图片，而且 Canvas 支持更加自由的动画效果。实际上在我平时的工作中其中一项内容就是 webGL/webGPU 的开发工作，不过工作中做的更多的是 3D 效果罢了。
+
+我们的茶饮模型不需要 3D 化，只要一个 2D 画面即可，所以我选择了常用的 <code>[PixiJS](https://pixijs.com/)</code> 库来进行模型绘制，再加上 <code>[gsap](https://greensock.com/gsap/)</code> 库来为 PixiJS 对象添加动画效果。
+
+在第一版时由于茶杯，茶底还有配料都是基于 html 的，所以都是 `.vue` 的组件，这一次在 Canvas 上绘制只有一个 `<canvas>` 标签，那么我们就可以将这些对象都抽离到 `.ts` typescript 文件中，做成一个个的 class，然后组装起来，这样一来，各类状态更加便于管理，茶饮里的各类部件便于进行抽象。比如茶饮里的各种配料，都可以继承与一个 `BaseItemsContainer` 的基类，实现里面的方法，而他们的显示与否，动画与否这些状态，也可以统一的进行控制。
+
+```ts
+import { Graphics } from "pixi.js";
+import { CupSize } from "@/types";
+import { CUP_HEIGHT } from "@/config";
+
+export interface BaseItem {
+    item: Graphics;
+    tween?: gsap.core.Tween
+}
+
+export interface Options {
+    cupSize?: CupSize;
+    visible?: boolean
+}
+
+export abstract class BaseItemsContainer {
+    protected group: BaseItem[] = [];
+    protected cupHeight: number;
+    private _visible: boolean
+
+    constructor({ cupSize = 'M', visible = false }: Options) {
+        this._visible = visible;
+        this.cupHeight = CUP_HEIGHT[cupSize];
+    }
+
+    get items() {
+        return this.group.map(e => e.item);
+    }
+
+    get visible() {
+        return this._visible;
+    }
+
+    set visible(val: boolean) {
+        this._visible = val;
+        this.group.forEach(e => e.item && (e.item.visible = val))
+    }
+
+    abstract draw(): any
+
+    abstract animate(): any
+
+    abstract changeVisible(visible: boolean): any
+
+    abstract changeCupSize(cupSize: CupSize): any
+}
+```
+
+具体的设计不在这里一一展开，感兴趣的朋友可以直接查看源码。最终，通过 Canvas 绘制的茶饮模型和第一版的也非常接近，而且可以轻松的通过 Canvas 的 API 进行图片转换，并且不会出现歪曲失真的情况。另外，这一版的设计也非常容易进行扩展，未来如果需要各种奇怪的配料，或者花哨的茶饮效果都可以通过强大的 Canvas 画布进行自由的绘制。
+
+## 最后说两句
+
+这个小玩具老婆虽然有些许的吐槽，不过总体上还是比较满意的，而对于我自己，也增加了更多的设计思路。很多时候我们做东西会遇到一些奇怪的问题，有些问题容易解决，有些问题则超出我们自己的能力范围，这个时候不妨也可以换种思路来进行，技术路线在一定的情况下也是可以灵活调整的，只要我们的目的不变就行了。

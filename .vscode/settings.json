@@ -12,6 +12,7 @@
         "outfile",
         "proto",
         "returntype",
+        "rgba",
         "tabler",
         "typeof"
     ]

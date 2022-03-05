@@ -36,4 +36,57 @@ DIY 环节中，左侧的茶底 Tab 会收缩隐藏起来，取而代之的是�
 
 第一次设计的时候，我采用了 CSS 来制作这个茶饮模型，毕竟通过上面的流程描述，你也应该能大概 get 到这是一个比较简单的东西，无非是画出一杯茶，加一些配料，然后加上少许的动画，以目前 CSS 的能力来说这些都比较容易实现的。
 
-首先是最外面的容器，杯子。一个矩形，高一点，窄一点，具体的宽高可以通过 vue3 最新的
+首先是最外面的容器，杯子。一个矩形，高一点，窄一点，具体的宽高可以通过 vue3 最新的 <code>[v-bind() in css](https://vuejs.org/api/sfc-css-features.html#v-bind-in-css)</code> 绑定到样式中，这样就可以提供一个杯子尺寸选择的功能了。再加个略带灰色的透明边框，顶部薄一点，底部厚一点。最后给这个杯子加个 transform 的 perspective 透视效果，绕着x轴稍微旋转一点，就可以做出杯子上大下小的效果了。当然，给杯子的外面加一个 relative 的父元素，作为内部元素绝对定位的基底。
+```css
+.cup {
+    width: v-bind(cupWidth);
+    height: v-bind(cupHeight);
+    border: 5px solid rgba(254, 254, 254, 0.6);
+    border-top: 0.2px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 10px solid rgba(255, 255, 255, 0.4);
+    transform: perspective(15px) rotateX(-1deg);
+}
+```
+
+接下来，就是茶底了。茶底需要有一个波浪动画，我的思路是用 svg 画一个比茶杯大一些的矩形，然后矩形的顶部画成波浪线，这样就有了一个顶部是波浪形的封闭矩形了。接着通过 CSS 的 animation 给这个波浪矩形加一段横向的无限循环平移动画。在 svg 的外部增加一个 overflow: hidden 的容器，这个容器的尺寸限制在茶杯内部，即宽度需要减去茶杯左右的边框宽度，高度比茶杯高度适当小一点，这样茶就不会有即将溢出的样子了，通过绝对定位将这个茶底容器放在杯子里，适当调整定位符合实际情况。这样 svg 在容器里平移时超出的部分就不会显示出来，看上去就像茶杯里的液体在做波浪形的流体动画。至于茶底的颜色，则可以通过 svg 的 `<linearGradient>` 标签来设置，而且可以是带透明度的渐变色，让茶底看上去更加的逼真，为其绑定两个变量，用于不同茶底时切换不同的颜色。
+
+```vue
+<template>
+    <div class="base-tea">
+        <div class="wave-wrapper">
+            <svg
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                width="1000"
+                height="1000"
+                viewBox="0 0 1000 1000"
+                xml:space="preserve"
+            >
+                <linearGradient id="linearTeaColor" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" :stop-color="color" />
+                    <stop offset="100%" :stop-color="linearColor" />
+                </linearGradient>
+
+                <path
+                    fill="url(#linearTeaColor)"
+                    class="wave"
+                    d="M300,300V2.5c0,0-0.6-0.1-1.1-0.1c0,0-25.5-2.3-40.5-2.4c-15,0-40.6,2.4-40.6,2.4
+            c-12.3,1.1-30.3,1.8-31.9,1.9c-2-0.1-19.7-0.8-32-1.9c0,0-25.8-2.3-40.8-2.4c-15,0-40.8,2.4-40.8,2.4c-12.3,1.1-30.4,1.8-32,1.9
+            c-2-0.1-20-0.8-32.2-1.9c0,0-3.1-0.3-8.1-0.7V300H300z"
+                />
+            </svg>
+        </div>
+    </div>
+</template>
+```
+
+由于茶底元素也是放在杯子元素里，所以同样会因为杯子的透视变换而变换。至此这杯茶基本的要素就已经存在了。后面的一些配料设计，配料动画以及步骤切换时的逻辑都不是本文讨论的部分，感兴趣的朋友可以直接查看源码。
+
+这个就是第一版的设计思路，通过常规的 html 元素加上 CSS 和 svg 的加成，制作一杯看上去不错的茶饮，现在我们来谈谈这里暴露出的问题。在上面的内容里我们知道这个玩具最后需要产生一张图片用于分享，第一版采用的是 html + css + svg，所以自然而然的我准备使用 <code>[dom-to-image](https://www.npmjs.com/package/dom-to-image)</code> 这个库来将茶饮模型转换为图片，接下来问题就出现了，在大部分浏览器上这样做没有太大的问题，转换出来的图片对原来的茶饮模型还原度较高。但是在 safari 就出现问题了，`transform: perspective` 没有被正常的解析，导致生成的图片出现了歪曲的现象。
+
+![error](/images/teahouse_error.jpg "teahouse-share")
+
+对于这个问题，我查找了`dom-to-image` 的一些 issues 以及网上的一些讨论话题，但是没有任何收获。而这个 `dom-to-image` 库本身也已经在几年前停止了维护，所以对目前的浏览器版本和标准肯定也存在一定的脱节。花了一些时间后，我决定不再此问题上继续钻牛角尖，必须换一个思路来解决问题。
+
+## 另一个思路的第二版

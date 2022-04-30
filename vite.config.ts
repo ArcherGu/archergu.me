@@ -102,4 +102,8 @@ export default defineConfig({
       'dayjs/plugin/localizedFormat',
     ],
   },
+  ssgOptions: {
+    formatting: 'minify',
+    format: 'cjs',
+  },
 })

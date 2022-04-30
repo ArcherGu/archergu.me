@@ -1,19 +1,19 @@
-import { resolve } from 'path';
-import fs from 'fs-extra';
-import { defineConfig } from 'vite';
-import Vue from '@vitejs/plugin-vue';
-import Pages from 'vite-plugin-pages';
-import Components from 'unplugin-vue-components/vite';
-import Markdown from 'vite-plugin-md';
-import Prism from 'markdown-it-prism';
-import LinkAttributes from 'markdown-it-link-attributes';
-import WindiCSS from 'vite-plugin-windicss';
-import Icons from 'unplugin-icons/vite';
-import IconsResolver from 'unplugin-icons/resolver';
+import { resolve } from 'path'
+import fs from 'fs-extra'
+import { defineConfig } from 'vite'
+import Vue from '@vitejs/plugin-vue'
+import Pages from 'vite-plugin-pages'
+import Components from 'unplugin-vue-components/vite'
+import Markdown from 'vite-plugin-md'
+import Prism from 'markdown-it-prism'
+import LinkAttributes from 'markdown-it-link-attributes'
+import WindiCSS from 'vite-plugin-windicss'
+import Icons from 'unplugin-icons/vite'
+import IconsResolver from 'unplugin-icons/resolver'
 
-import matter from 'gray-matter';
-import anchor from 'markdown-it-anchor';
-import { slugify } from './scripts/slugify';
+import matter from 'gray-matter'
+import anchor from 'markdown-it-anchor'
+import { slugify } from './scripts/slugify'
 
 export default defineConfig({
   resolve: {
@@ -31,15 +31,15 @@ export default defineConfig({
       extensions: ['vue', 'md'],
       pagesDir: 'pages',
       extendRoute(route) {
-        const path = resolve(__dirname, route.component.slice(1));
+        const path = resolve(__dirname, route.component.slice(1))
 
         if (!path.includes('projects.md')) {
-          const md = fs.readFileSync(path, 'utf-8');
-          const { data } = matter(md);
-          route.meta = Object.assign(route.meta || {}, { frontmatter: data });
+          const md = fs.readFileSync(path, 'utf-8')
+          const { data } = matter(md)
+          route.meta = Object.assign(route.meta || {}, { frontmatter: data })
         }
 
-        return route;
+        return route
       },
     }),
 
@@ -51,14 +51,14 @@ export default defineConfig({
         quotes: '""\'\'',
       },
       markdownItSetup(md) {
-        md.use(Prism);
+        md.use(Prism)
         md.use(anchor, {
           slugify,
           permalink: anchor.permalink.linkInsideHeader({
             symbol: '#',
             placement: 'before',
-          })
-        });
+          }),
+        })
 
         md.use(LinkAttributes, {
           matcher: (link: string) => /^https?:\/\//.test(link),
@@ -66,7 +66,7 @@ export default defineConfig({
             target: '_blank',
             rel: 'noopener',
           },
-        });
+        })
       },
     }),
 
@@ -102,4 +102,4 @@ export default defineConfig({
       'dayjs/plugin/localizedFormat',
     ],
   },
-});
+})

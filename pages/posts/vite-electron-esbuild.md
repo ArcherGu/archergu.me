@@ -44,29 +44,29 @@ Vite 的基本原理大家应该都已经清楚了，基于原生 ESM 的开发�
 前端部分其实不需要太大的修改，毕竟 Vite 都已经帮我们封装好了，唯一要做的也许只是目录结构的调整（你也可以不调整，看你的规范程度 😝），将前端的代码都放到 `src/render` 目录下，然后修改一下 vite.config.ts:
 
 ```ts
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import dotenv from 'dotenv';
-import { join } from 'path';
-dotenv.config({ path: join(__dirname, '.env') });
+import { join } from 'path'
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import dotenv from 'dotenv'
+dotenv.config({ path: join(__dirname, '.env') })
 
 export default defineConfig({
-    root: join(__dirname, 'src/render'), // 现在的 root 在 src/render 下了
-    plugins: [vue()],
-    resolve: {
-        alias: {
-            /* ...路径调整了，alias也需要对应的修改 */
-        },
+  root: join(__dirname, 'src/render'), // 现在的 root 在 src/render 下了
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      /* ...路径调整了，alias也需要对应的修改 */
     },
-    base: './',
-    build: {
-        outDir: join(__dirname, 'dist/render'), // 输出路径
-        emptyOutDir: true,
-    },
-    server: {
-        port: +process.env.PORT,
-    },
-});
+  },
+  base: './',
+  build: {
+    outDir: join(__dirname, 'dist/render'), // 输出路径
+    emptyOutDir: true,
+  },
+  server: {
+    port: +process.env.PORT,
+  },
+})
 ```
 
 ### Electron 部分
@@ -77,89 +77,95 @@ export default defineConfig({
 
 ```ts
 // esbuild.options.ts
-import { join } from 'path';
-import { esbuildDecorators } from '@anatine/esbuild-decorators';
-import { builtinModules } from 'module';
-import { BuildOptions } from 'esbuild';
+import { join } from 'path'
+import { builtinModules } from 'module'
+import { esbuildDecorators } from '@anatine/esbuild-decorators'
+import type { BuildOptions } from 'esbuild'
 
 export function createOptions(): BuildOptions {
-    return {
-        entryPoints: [join(__dirname, '../src/main/index.ts')],
-        outfile: join(__dirname, '../dist/main/index.js'),
-        format: 'cjs',
-        bundle: true,
-        platform: 'node',
-        plugins: [
-            esbuildDecorators({
-                tsconfig: join(__dirname, '../tsconfig.json'),
-            }),
-        ],
-        external: [...builtinModules.filter((x) => !/^_|^(internal|v8|node-inspect)\/|\//.test(x)), 'electron'],
-    };
+  return {
+    entryPoints: [join(__dirname, '../src/main/index.ts')],
+    outfile: join(__dirname, '../dist/main/index.js'),
+    format: 'cjs',
+    bundle: true,
+    platform: 'node',
+    plugins: [
+      esbuildDecorators({
+        tsconfig: join(__dirname, '../tsconfig.json'),
+      }),
+    ],
+    external: [...builtinModules.filter(x => !/^_|^(internal|v8|node-inspect)\/|\//.test(x)), 'electron'],
+  }
 }
 ```
 
 构建脚本`build.ts`:
 
 ```ts
-import { join } from 'path';
-import dotenv from 'dotenv';
-import { spawn, ChildProcess } from 'child_process';
-import electron from 'electron';
-import minimist from 'minimist';
-import waitOn from 'wait-on';
-import { build } from 'esbuild';
-import { main } from '../package.json';
-import { createOptions } from './esbuild.options';
-dotenv.config({ path: join(__dirname, '../.env') });
+import { join } from 'path'
+import type { ChildProcess } from 'child_process'
+import { spawn } from 'child_process'
+import dotenv from 'dotenv'
+import electron from 'electron'
+import minimist from 'minimist'
+import waitOn from 'wait-on'
+import { build } from 'esbuild'
+import { main } from '../package.json'
+import { createOptions } from './esbuild.options'
+dotenv.config({ path: join(__dirname, '../.env') })
 
-const argv = minimist(process.argv.slice(2));
-const options = createOptions();
+const argv = minimist(process.argv.slice(2))
+const options = createOptions()
 
 const runApp = () => {
-    return spawn(electron as any, [join(__dirname, `../${main}`)], { stdio: 'inherit' });
-};
+  return spawn(electron as any, [join(__dirname, `../${main}`)], { stdio: 'inherit' })
+}
 
 if (argv.watch) {
-    waitOn(
-        {
-            resources: [`http://localhost:${process.env.PORT}/index.html`],
-            timeout: 5000,
-        },
-        (err: any) => {
-            if (err) {
-                console.log(err);
-                process.exit(1);
-            } else {
-                let child: ChildProcess;
-                build({
-                    ...options,
-                    watch: {
-                        onRebuild(error) {
-                            if (error) {
-                                console.error('Rebuild Failed:', error);
-                            } else {
-                                console.log('Rebuild Succeeded');
-                                if (child) child.kill();
-                                child = runApp();
-                            }
-                        },
-                    },
-                }).then(() => {
-                    if (child) child.kill();
-                    child = runApp();
-                });
-            }
-        }
-    );
-} else {
-    build(options)
-        .then(() => {
-            console.log('Electron Build Succeeded.');
+  waitOn(
+    {
+      resources: [`http://localhost:${process.env.PORT}/index.html`],
+      timeout: 5000,
+    },
+    (err: any) => {
+      if (err) {
+        console.log(err)
+        process.exit(1)
+      }
+      else {
+        let child: ChildProcess
+        build({
+          ...options,
+          watch: {
+            onRebuild(error) {
+              if (error) {
+                console.error('Rebuild Failed:', error)
+              }
+              else {
+                console.log('Rebuild Succeeded')
+                if (child)
+                  child.kill()
+                child = runApp()
+              }
+            },
+          },
+        }).then(() => {
+          if (child)
+            child.kill()
+          child = runApp()
         })
-        .catch((error) => {
-            console.log('Electron Build Failed\n', error, '\n');
-        });
+      }
+    }
+  )
+}
+else {
+  build(options)
+    .then(() => {
+      console.log('Electron Build Succeeded.')
+    })
+    .catch((error) => {
+      console.log('Electron Build Failed\n', error, '\n')
+    })
 }
 ```
 

@@ -41,10 +41,10 @@ src
 上面说到，我的集成方案里是将 Electron 集成到 Nest.js 中，所以应用的启动也和 Nest.js 一样，下面是 Nest.js 文档中的默认启动方法:
 ```ts
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const app = await NestFactory.create(AppModule)
+  await app.listen(3000)
 }
-bootstrap();
+bootstrap()
 ```
 在一个 `bootstrap` 方法中，创建一个实例，然后监听某个端口，当然这是 Nest.js 作为后端框架的常规启动方式，默认情况[<sup>[1]</sup>](#refer-1)下内部其实是启动了一个 [Express](https://expressjs.com/)。不过我们和前端的通信可不是 HTTP 而是通过 Electron 的 IPC，所以需要换一种方式来创建实例。
 
@@ -55,11 +55,11 @@ bootstrap();
 根据文档[<sup>[2]</sup>](#refer-2)，这个传输器需要继承 `@nestjs/microservices` 的 `Server`，实现 `CustomTransportStrategy`:
 ```ts
 export class ElectronIpcTransport extends Server implements CustomTransportStrategy {
-    listen(callback: () => void): any {
-        callback();
-    }
+  listen(callback: () => void): any {
+    callback()
+  }
 
-    close(): any { }
+  close(): any { }
 }
 ```
 - `listen` 方法会在 `app.listen()` 时调用，我们可以在这个方法里把各个请求的方法注册到 IPC 通道上。
@@ -68,11 +68,11 @@ export class ElectronIpcTransport extends Server implements CustomTransportStrat
 请求方法的绑定我们还是需要借助装饰器:
 ```ts
 export function IpcInvoke(messageChannel: string) {
-    ipcMain.handle(messageChannel, (...args) => ipcMessageDispatcher.emit(messageChannel, ...args));
+  ipcMain.handle(messageChannel, (...args) => ipcMessageDispatcher.emit(messageChannel, ...args))
 
-    return applyDecorators(
-        MessagePattern(messageChannel),
-    );
+  return applyDecorators(
+    MessagePattern(messageChannel),
+  )
 }
 ```
 上面这个方法是一个装饰器构造器，其中出现了一些莫名的东西: 
@@ -85,26 +85,26 @@ export function IpcInvoke(messageChannel: string) {
 ```ts
 @Controller()
 export class AppController {
-    constructor() { }
+  constructor() { }
 
-    @IpcInvoke('msg')
-    public async handleSendMsg(msg: string): Promise<string> {
-        return `The main process received your message: ${msg}`;
-    }
+  @IpcInvoke('msg')
+  public async handleSendMsg(msg: string): Promise<string> {
+    return `The main process received your message: ${msg}`
+  }
 }
 ```
 
 现在我们来说说这个 `ipcMessageDispatcher`:
 ```ts
 class IPCMessageDispatcher extends EventEmitter {
-    // @ts-ignore
-    async emit(messageChannel: string, ...args: any[]): Promise<any> {
-        const [ipcHandler] = this.listeners('ipc-message');
+  // @ts-expect-error
+  async emit(messageChannel: string, ...args: any[]): Promise<any> {
+    const [ipcHandler] = this.listeners('ipc-message')
 
-        if (ipcHandler) {
-            return Reflect.apply(ipcHandler, this, [messageChannel, ...args]);
-        }
-    }
+    if (ipcHandler)
+      return Reflect.apply(ipcHandler, this, [messageChannel, ...args])
+
+  }
 }
 ```
 它的 `emit` 方法内，获取了监听 "ipc-message" 事件名的方法 `ipcHandler`，然后将 IPC 用到的事件名 `messageChannel` 和相关的参数用这个 `ipcHandler` 进行处理。（`Reflect.apply`：通过指定的参数列表发起对目标函数的调用[<sup>[3]</sup>](#refer-3)）。所以，当渲染进程触发 IPC 事件时，`ipcMessageDispatcher` 会将对应的事件名和相关的参数（如果有的话），统一交给监听了 "ipc-message" 事件的 `ipcHandler` 处理，这个 `ipcHandler` 就是我们上面说到的黑箱。下面，将揭开这个黑箱的真面目。
@@ -119,21 +119,22 @@ listen(callback: () => void): any {
 `ipcMessageDispatcher` 监听了一个 “ipc-message” 事件，就是上面 `emit` 中获取 `ipcHandler` 这个监听者时所查询的事件名，`ipcHandler`就是传输器的自定义方法 `onMessage`，这个 `onMessage` 是一个总的调度器，用于对 IPC 的事件进行分发。下面是 `onMessage` 方法的实现:
 ```ts
 export class ElectronIpcTransport extends Server implements CustomTransportStrategy {
-    async onMessage(messageChannel: string, ...args: any[]): Promise<any> {
-        const handler: MessageHandler | undefined = this.messageHandlers.get(messageChannel);
-        if (!handler) return;
+  async onMessage(messageChannel: string, ...args: any[]): Promise<any> {
+    const handler: MessageHandler | undefined = this.messageHandlers.get(messageChannel)
+    if (!handler)
+      return
 
-        const [ipcMainEventObject, ...payload] = args;
-        const data = (!payload || payload.length === 0) ? undefined : payload.length === 1 ? payload[0] : payload;
+    const [ipcMainEventObject, ...payload] = args
+    const data = (!payload || payload.length === 0) ? undefined : payload.length === 1 ? payload[0] : payload
 
-        const result = await handler(data, {
-            evt: ipcMainEventObject,
-        });
+    const result = await handler(data, {
+      evt: ipcMainEventObject,
+    })
 
-        return {
-            data: result,
-        };
+    return {
+      data: result,
     }
+  }
 }
 ```
 `this.messageHandlers` 就是上面 `MessagePattern` 装饰器注册事件和处理方法的地方，我们通过 IPC 的事件名 `messageChannel` 获取到
@@ -146,14 +147,14 @@ export class ElectronIpcTransport extends Server implements CustomTransportStrat
 完成上面的微服务传输器和相关的装饰器以后，我们就可以继续来创建应用实例了:
 ```ts
 async function bootstrap() {
-    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-        AppModule,
-        {
-            strategy: new ElectronIpcTransport(),
-        },
-    );
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      strategy: new ElectronIpcTransport(),
+    },
+  )
 
-    await app.listen();
+  await app.listen()
 }
 ```
 我们使用工厂函数创建一个微服务，包含app module（默认module），使用 Electron IPC 的传输器策略，然后通过 `listen()` 方法将各个事件方法注册到 IPC 通道。
@@ -161,48 +162,48 @@ async function bootstrap() {
 到这里为止，我们只是启动了 Nest.js 的框架，以及相关通信方法的注册，而 Electron 的主窗口还没有启动。Electron 的主窗口可以选择在 `bootstrap()` 启动方法里进行创建，但是我这里习惯将其作为一个 module 来启动，在 `src/main/global` 目录下，新建一个 `win.module.ts` 文件:
 ```ts
 // win.module.ts
-import { Module } from '@nestjs/common';
-import { app, BrowserWindow } from 'electron';
-import { join } from 'path';
+import { join } from 'path'
+import { Module } from '@nestjs/common'
+import { BrowserWindow, app } from 'electron'
 
 @Module({
-    providers: [{
-        provide: 'WEB_CONTENTS',
-        async useFactory() {
-            app.on('window-all-closed', () => {
-                if (process.platform !== 'darwin') {
-                    app.quit();
-                }
-            });
+  providers: [{
+    provide: 'WEB_CONTENTS',
+    async useFactory() {
+      app.on('window-all-closed', () => {
+        if (process.platform !== 'darwin')
+          app.quit()
 
-            await app.whenReady();
+      })
 
-            const win = new BrowserWindow({
-                width: 1000,
-                height: 800,
-                webPreferences: {
-                    nodeIntegration: true,
-                    webSecurity: false,
-                    contextIsolation: false,
-                },
-            });
+      await app.whenReady()
 
-            win.maximize();
+      const win = new BrowserWindow({
+        width: 1000,
+        height: 800,
+        webPreferences: {
+          nodeIntegration: true,
+          webSecurity: false,
+          contextIsolation: false,
+        },
+      })
 
-            const URL = !app.isPackaged
-                ? `http://localhost:${process.env.PORT}`
-                : `file://${join(app.getAppPath(), 'dist/render/index.html')}`;
+      win.maximize()
 
-            win.loadURL(URL);
+      const URL = !app.isPackaged
+        ? `http://localhost:${process.env.PORT}`
+        : `file://${join(app.getAppPath(), 'dist/render/index.html')}`
 
-            win.on('closed', () => {
-                win.destroy();
-            });
+      win.loadURL(URL)
 
-            return win.webContents;
-        }
-    }],
-    exports: ['WEB_CONTENTS']
+      win.on('closed', () => {
+        win.destroy()
+      })
+
+      return win.webContents
+    }
+  }],
+  exports: ['WEB_CONTENTS']
 })
 export class WinModule { }
 ```
@@ -212,15 +213,15 @@ export class WinModule { }
 
 最后，只要将这个 `WinModule` 导入到 `AppModule` 中，当 Nest.js 框架启动后，窗口也将进行创建，整个 Electron 应用就启动了:
 ```ts
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { WinModule } from './global/win.module';
+import { Module } from '@nestjs/common'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { WinModule } from './global/win.module'
 
 @Module({
-    imports: [WinModule],
-    controllers: [AppController],
-    providers: [AppService],
+  imports: [WinModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule { }
 ```

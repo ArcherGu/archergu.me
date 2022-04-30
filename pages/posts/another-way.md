@@ -98,50 +98,50 @@ DIY 环节中，左侧的茶底 Tab 会收缩隐藏起来，取而代之的是�
 在第一版时由于茶杯，茶底还有配料都是基于 html 的，所以都是 `.vue` 的组件，这一次在 Canvas 上绘制只有一个 `<canvas>` 标签，那么我们就可以将这些对象都抽离到 `.ts` typescript 文件中，做成一个个的 class，然后组装起来，这样一来，各类状态更加便于管理，茶饮里的各类部件便于进行抽象。比如茶饮里的各种配料，都可以继承与一个 `BaseItemsContainer` 的基类，实现里面的方法，而他们的显示与否，动画与否这些状态，也可以统一的进行控制。
 
 ```ts
-import { Graphics } from "pixi.js";
-import { CupSize } from "@/types";
-import { CUP_HEIGHT } from "@/config";
+import type { Graphics } from 'pixi.js'
+import type { CupSize } from '@/types'
+import { CUP_HEIGHT } from '@/config'
 
 export interface BaseItem {
-    item: Graphics;
-    tween?: gsap.core.Tween
+  item: Graphics
+  tween?: gsap.core.Tween
 }
 
 export interface Options {
-    cupSize?: CupSize;
-    visible?: boolean
+  cupSize?: CupSize
+  visible?: boolean
 }
 
 export abstract class BaseItemsContainer {
-    protected group: BaseItem[] = [];
-    protected cupHeight: number;
-    private _visible: boolean
+  protected group: BaseItem[] = []
+  protected cupHeight: number
+  private _visible: boolean
 
-    constructor({ cupSize = 'M', visible = false }: Options) {
-        this._visible = visible;
-        this.cupHeight = CUP_HEIGHT[cupSize];
-    }
+  constructor({ cupSize = 'M', visible = false }: Options) {
+    this._visible = visible
+    this.cupHeight = CUP_HEIGHT[cupSize]
+  }
 
-    get items() {
-        return this.group.map(e => e.item);
-    }
+  get items() {
+    return this.group.map(e => e.item)
+  }
 
-    get visible() {
-        return this._visible;
-    }
+  get visible() {
+    return this._visible
+  }
 
-    set visible(val: boolean) {
-        this._visible = val;
-        this.group.forEach(e => e.item && (e.item.visible = val))
-    }
+  set visible(val: boolean) {
+    this._visible = val
+    this.group.forEach(e => e.item && (e.item.visible = val))
+  }
 
-    abstract draw(): any
+  abstract draw(): any
 
-    abstract animate(): any
+  abstract animate(): any
 
-    abstract changeVisible(visible: boolean): any
+  abstract changeVisible(visible: boolean): any
 
-    abstract changeCupSize(cupSize: CupSize): any
+  abstract changeCupSize(cupSize: CupSize): any
 }
 ```
 

@@ -49,15 +49,15 @@ view->page()->setWebChannel(channel);
 
 ```js
 new QWebChannel(qt.webChannelTransport, (channel) => {
-  window.webObj = channel.objects.webObj;
-});
+  window.webObj = channel.objects.webObj
+})
 ```
 
 然后，我们就可以在 JS 侧愉快的使用 C++ 中使用的方法了:
 
 ```js
-const result = window.webObj.sendToQT("Hello, QT, I'm JS");
-console.log(result); // Hi, JS, I'm QT
+const result = window.webObj.sendToQT('Hello, QT, I\'m JS')
+console.log(result) // Hi, JS, I'm QT
 ```
 
 ## C++ 传递数据给 Javascript
@@ -89,9 +89,9 @@ class WebObj : public QObject
 
 ```js
 const callback = (strParameter) => {
-  console.log(strParameter);
-};
-window.webObj.someThingChange.connect(callback);
+  console.log(strParameter)
+}
+window.webObj.someThingChange.connect(callback)
 ```
 
 ## 个人经验

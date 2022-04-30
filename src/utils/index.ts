@@ -1,2 +1,2 @@
-export * from "./tools";
-export * from "./introduce";
+export * from './tools'
+export * from './introduce'

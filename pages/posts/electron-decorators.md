@@ -16,34 +16,33 @@ duration: 30min
 
 常规的 Web 前端项目中，我们会提供一个 api 调用器，比如 [axios](https://axios-http.com/) 这样的 http 库。然后提供一个 `/api` 目录，将相关的接口存放在其中。Electron 中的渲染部分也是如此，只不过这里的 api 调用器被替换成了 [ipcRenderer](https://www.electronjs.org/docs/api/ipc-renderer)。通过 ipcRenderer 渲染进程可以同步或异步的发送消息到主进程，也可以接收主进程回复的消息。我们可以开启 [nodeIntegration](https://www.electronjs.org/docs/latest/api/browser-window#new-browserwindowoptions) 在渲染进程直接调用<sup>[[不安全](https://www.electronjs.org/docs/latest/tutorial/security/#2-do-not-enable-nodejs-integration-for-remote-content)]</sup>：
 ```ts
-const { ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require('electron')
 ```
 或者使用 [contextBridge](https://www.electronjs.org/docs/latest/tutorial/context-isolation) 将 ipcRenderer 挂载到 `window` 下以供渲染进程使用<sup>[[推荐](https://www.electronjs.org/docs/latest/tutorial/context-isolation)]</sup>。
 
 为了让 ipcRenderer 更像一个 api 调用器，我们需要对其进行一些封装:
 ```ts
 interface IpcResponse<T> {
-    data?: T;
-    error?: any;
+  data?: T
+  error?: any
 }
 
 async function ipcInvoke<T = any>(target: string, ...args: any[]) {
-    const response: IpcResponse<T> = await ipcRenderer.invoke(target, ...args);
-    if (response.hasOwnProperty('error')) {
-        throw response;
-    }
+  const response: IpcResponse<T> = await ipcRenderer.invoke(target, ...args)
+  if (response.hasOwnProperty('error'))
+    throw response
 
-    return response;
+  return response
 }
 ```
 api 封装:
 ```ts
 export function sendMsgToMainProcess(msg: string) {
-    return ipcInvoke<string>('send-msg', msg);
+  return ipcInvoke<string>('send-msg', msg)
 }
 
 // 实际调用
-const { data } = await sendMsgToMainProcess('Hi! Main Process!');
+const { data } = await sendMsgToMainProcess('Hi! Main Process!')
 ```
 
 渲染进程的代码经过上述的封装后应该很接近常规 Web 项目的写法了，后续如果更换到 B/S 架构，只需要将 api 调用器进行更换就行了。
@@ -57,8 +56,8 @@ const { data } = await sendMsgToMainProcess('Hi! Main Process!');
 在这里主要说明以下 Controller 的设计方式，因为渲染进程调用 api 时，Controller 承接着 api 的请求和响应。一般在 Electron 中的写法是通过 [ipcMain](https://www.electronjs.org/docs/api/ipc-main) 来监听 ipcRenderer 的消息:
 ```ts
 ipcMain.handle('send-msg', (e, msg: string) => {
-    console.log(msg) // Hi! Main Process!
-    return 'Hello! Renderer Process!';
+  console.log(msg) // Hi! Main Process!
+  return 'Hello! Renderer Process!'
 })
 ```
 
@@ -86,7 +85,7 @@ ipcMain.handle('send-msg', (e, msg: string) => {
 {
     "compilerOptions":{
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
+        "emitDecoratorMetadata": true
     }
 }
 ```
@@ -97,7 +96,7 @@ npm i reflect-metadata --save
 在主进程的入口文件中引用:
 ```ts
 // main.ts
-import 'reflect-metadata';
+import 'reflect-metadata'
 ```
 理解了装饰器和元数据的概念，以及引入两者的准备工作后，接下来就需要设计一些装饰器。
 
@@ -107,9 +106,9 @@ import 'reflect-metadata';
 首先需要解决 Controller 的实例化，这里可以设计一个名为 `@Controller` 的类装饰器:
 ```ts
 export function Controller(): ClassDecorator {
-    return (target: object) => {
-        // do nothing
-    };
+  return (target: object) => {
+    // do nothing
+  }
 }
 ```
 可以看到这个装饰器什么都没有做，只是定义了一个装饰器工厂函数，返回了一个空的类装饰器，为什么这样做呢？当我们使用装饰器时，reflect-metadata 会自动为所装饰的 target 添加上几个默认的元数据信息[<sup>[2]</sup>](#refer-1):
@@ -128,31 +127,31 @@ export function Controller(): ClassDecorator {
 为此，又需要设计一个新的装饰器，这个装饰器用来装饰那些需要注入的 Services:
 ```ts
 export function Injectable(name: string): ClassDecorator {
-    return (target: object) => {
-        Reflect.defineMetadata('name', name, target);
-    };
+  return (target: object) => {
+    Reflect.defineMetadata('name', name, target)
+  }
 }
 ```
 `@Injectable` 定义了一个 `name` 键用来存放注入项的名称，用于区分各个注入项。另外，作为一个类装饰器，它同样会将注入项的构造函数存入元数据集中。
 
 接下来，就是具体的 Controller 实例化过程。首先，我们需要定义一个数组，将 Controllers 放在其中：
 ```ts
-const controllers = [ MyController ];
+const controllers = [MyController]
 ```
 然后定义一个工厂函数用来自动实例化这些 Controllers 和 Services:
 ```ts
-const ExistInjectable = {};
+const ExistInjectable = {}
 function factory(constructor) {
-    const paramtypes = Reflect.getMetadata('design:paramtypes', constructor);
+  const paramtypes = Reflect.getMetadata('design:paramtypes', constructor)
 
-    const services = paramtypes.map((service) => {
-        const name = Reflect.getMetadata('name', service);
-        const item = ExistInjectable[name] || factory(service);
-        ExistInjectable[name] = item;
-        return item;
-    });
+  const services = paramtypes.map((service) => {
+    const name = Reflect.getMetadata('name', service)
+    const item = ExistInjectable[name] || factory(service)
+    ExistInjectable[name] = item
+    return item
+  })
 
-    return new constructor(...services);
+  return new constructor(...services)
 }
 ```
 上面的代码中:
@@ -163,7 +162,7 @@ function factory(constructor) {
 Controller 实例化:
 ```ts
 for (const ControllerClass of controllers) {
-    const controller = factory(ControllerClass);
+  const controller = factory(ControllerClass)
 }
 ```
 这样，通过 `@Controller` 和 `@Injectable` 装饰器，就完成了 Controller 的实例化，并将它们所依赖的 Services 成功注入。
@@ -173,39 +172,40 @@ for (const ControllerClass of controllers) {
 解决了 Controller 的实例化问题，接下来，需要解决 ipcMain 监听 ipcRenderer 消息，绑定对应的处理函数的问题了。同样，我们需要设计一个 `@IpcInvoke` 的装饰器:
 ```ts
 export function IpcInvoke(event: string): MethodDecorator {
-    return (target: any, propertyName: string) => {
-        Reflect.defineMetadata('ipc-invoke', event, target, propertyName);
-    };
+  return (target: any, propertyName: string) => {
+    Reflect.defineMetadata('ipc-invoke', event, target, propertyName)
+  }
 }
 ```
 这是一个方法装饰器，定义了一个 `ipc-invoke` 的键用于存放消息事件的名称。接下来是具体的使用方法:
 ```ts
-const controller = factory(ControllerClass);
-const proto = ControllerClass.prototype;
+const controller = factory(ControllerClass)
+const proto = ControllerClass.prototype
 const funcs = Object.getOwnPropertyNames(proto).filter(
-    (item) => typeof controller[item] === 'function' && item !== 'constructor'
-);
+  item => typeof controller[item] === 'function' && item !== 'constructor'
+)
 
 funcs.forEach((funcName) => {
-    let event: string | null = null;
-    event = Reflect.getMetadata('ipc-invoke', proto, funcName);
-    if (event) {
-        ipcMain.handle(event, async (e, ...args) => {
-            try {
-                const result = await controller[funcName].call(controller, ...args);
+  let event: string | null = null
+  event = Reflect.getMetadata('ipc-invoke', proto, funcName)
+  if (event) {
+    ipcMain.handle(event, async (e, ...args) => {
+      try {
+        const result = await controller[funcName].call(controller, ...args)
 
-                return {
-                    data: result,
-                };
-            } catch (error) {
-                console.log(error);
-                return {
-                    error: error,
-                };
-            }
-        });
-    }
-});
+        return {
+          data: result,
+        }
+      }
+      catch (error) {
+        console.log(error)
+        return {
+          error,
+        }
+      }
+    })
+  }
+})
 ```
 上面的代码中:
 - 完成 Controller 的实例化，这里是接上面的 Controller 实例化相关的部分。
@@ -220,24 +220,24 @@ funcs.forEach((funcName) => {
 // MyController.ts
 @Controller()
 export class MyController {
-    constructor(
-        private myService: MyService
-    ) { }
+  constructor(
+    private myService: MyService
+  ) { }
 
-    @IpcInvoke(EVENTS.SEND_MSG)
-    public async handleSendMsg(msg: string): Promise<string> {
-        return this.myService.reply();
-    }
+  @IpcInvoke(EVENTS.SEND_MSG)
+  public async handleSendMsg(msg: string): Promise<string> {
+    return this.myService.reply()
+  }
 }
 
 // MyService.ts
 @Injectable('MyService')
 export class MyService {
-    constructor() { /* do nothing */ }
+  constructor() { /* do nothing */ }
 
-    public reply(): string {
-        return 'Hello! Renderer Process!';
-    }
+  public reply(): string {
+    return 'Hello! Renderer Process!'
+  }
 }
 ```
 

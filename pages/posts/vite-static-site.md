@@ -41,8 +41,8 @@ $ npm init @vitejs/app vite-static-site
 
 ```ts
 // vite.config.ts
-import { defineConfig } from "vite";
-import ViteVue from "@vitejs/plugin-vue";
+import { defineConfig } from 'vite'
+import ViteVue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [
@@ -50,7 +50,7 @@ export default defineConfig({
       include: [/\.vue$/, /\.md$/],
     }),
   ],
-});
+})
 ```
 
 ~~基于 <vscode-icons-file-type-vite /> [Vite.js](https://vitejs.dev/) 和 <vscode-icons-file-type-vue /> [Vue.js - 3.0](https://v3.vuejs.org/)，支持 <vscode-icons-file-type-typescript-official /> [TypeScript](https://www.typescriptlang.org/)~~
@@ -75,29 +75,29 @@ $ npm install @types/fs-extra @types/node fs-extra gray-matter -D
 ```ts
 // vite.config.ts (以下为该插件的配置，不包括其他插件的配置)
 // ...
-import VitePages from "vite-plugin-pages";
-import { resolve } from "path";
-import fs from "fs-extra";
-import matter from "gray-matter";
+import { resolve } from 'path'
+import VitePages from 'vite-plugin-pages'
+import fs from 'fs-extra'
+import matter from 'gray-matter'
 
 // plugins settings
 export default defineConfig({
   plugins: [
-    //...
+    // ...
     VitePages({
-      extensions: ["vue", "md"],
-      pagesDir: "pages",
+      extensions: ['vue', 'md'],
+      pagesDir: 'pages',
       extendRoute(route) {
-        const path = resolve(__dirname, route.component.slice(1));
-        const md = fs.readFileSync(path, "utf-8");
-        const { data } = matter(md);
-        route.meta = Object.assign(route.meta || {}, { frontmatter: data });
+        const path = resolve(__dirname, route.component.slice(1))
+        const md = fs.readFileSync(path, 'utf-8')
+        const { data } = matter(md)
+        route.meta = Object.assign(route.meta || {}, { frontmatter: data })
 
-        return route;
+        return route
       },
     }),
   ],
-});
+})
 ```
 
 - `extensions`：需要包含的文件类型，这里显然是 `.vue` 和 `.md` 文件。
@@ -120,20 +120,20 @@ export default defineConfig({
 
 ```ts
 // src/main.ts
-import App from "./App.vue";
-import { createApp } from "vue";
-import routes from "pages-generated"; // vite-plugin-pages 生成的路由信息
-import { createRouter, createWebHistory } from "vue-router";
+import { createApp } from 'vue'
+import routes from 'pages-generated' // vite-plugin-pages 生成的路由信息
+import { createRouter, createWebHistory } from 'vue-router'
+import App from './App.vue'
 
-const app = createApp(App);
+const app = createApp(App)
 app.use(
   createRouter({
     history: createWebHistory(),
     routes,
   })
-);
+)
 
-app.mount("#app");
+app.mount('#app')
 ```
 
 <blockquote>
@@ -188,15 +188,15 @@ $ npm i vite-plugin-md -D
 ```ts
 // vite.config.ts (以下为该插件的配置，不包括其他插件的配置)
 // ...
-import ViteMarkdown from "vite-plugin-md";
+import ViteMarkdown from 'vite-plugin-md'
 
 // plugins settings
 export default defineConfig({
   plugins: [
-    //...
+    // ...
     ViteMarkdown(),
   ],
-});
+})
 ```
 
 现在我们就可以在 `pages` 目录下创建一个 `bar.md` 来尝试一下了：
@@ -239,18 +239,18 @@ This is a markdown page.
 ```ts
 // vite.config.ts (以下为该插件的配置，不包括其他插件的配置)
 // ...
-import ViteComponents from "vite-plugin-components";
+import ViteComponents from 'vite-plugin-components'
 
 // plugins settings
 export default defineConfig({
   plugins: [
-    //...
+    // ...
     ViteComponents({
-      extensions: ["vue", "md"],
-      customLoaderMatcher: (path) => path.endsWith(".md"),
+      extensions: ['vue', 'md'],
+      customLoaderMatcher: path => path.endsWith('.md'),
     }),
   ],
-});
+})
 ```
 
 重启项目，此时 `MyComponent` 组件已经正确的显示了！
@@ -276,12 +276,12 @@ $ npm install @vue/server-renderer -D
 
 ```ts
 // src/main.ts
-import App from "./App.vue";
-import routes from "pages-generated";
-import { ViteSSG } from "vite-ssg";
+import routes from 'pages-generated'
+import { ViteSSG } from 'vite-ssg'
+import App from './App.vue'
 
 // `export const createApp` is required
-export const createApp = ViteSSG(App, { routes });
+export const createApp = ViteSSG(App, { routes })
 ```
 
 然后我们也需要修改一下 `package.json` 中的 `scripts`：

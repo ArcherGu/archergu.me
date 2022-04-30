@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Dosis:700,600");
-@import "./markdown.postcss";
+@import "./markdown.scss";
 
 html,
 body,
@@ -52,35 +52,35 @@ html {
 }
 
 .btn {
-  @apply px-4 py-1 rounded inline-block
-    bg-teal-600 text-white cursor-pointer
-    hover:bg-teal-700
-    disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50;
+  @apply px-4 py-1 rounded inline-block bg-teal-600 text-white cursor-pointer hover: bg-teal-700 disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50;
 }
 
 .icon-btn {
-  @apply inline-block cursor-pointer select-none
-    opacity-75 transition duration-200 ease-in-out
-    hover:opacity-100 hover:text-teal-600;
+  @apply inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover: opacity-100 hover:text-teal-600;
 }
 
 * {
   scrollbar-color: var(--c-scrollbar) var(--c-bg);
 }
+
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar:horizontal {
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--c-bg);
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--c-scrollbar);
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--c-scrollbar-hover);
 }

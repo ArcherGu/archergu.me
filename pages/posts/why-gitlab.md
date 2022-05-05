@@ -30,6 +30,7 @@ GitHub 虽然是我们平时最常用的开源代码托管平台，但是在企�
 
 完成需求分析后，我们就开始技术选型。由于我个人平时使用的最多的是 <vscode-icons-file-type-vue /> Vue.js 相关的技术栈，所以我的选择是 <vscode-icons-file-type-vite /> Vite.js + <vscode-icons-file-type-vue /> Vue.js（3.x） 的组合。其他相关的技术：
 - 路由：Vue Router
+- 多语言：Vue-i18n
 - 样式：Windicss + Sass
 - 图标：Unplugin Icons
 - MD 转 HTML：Markdown It

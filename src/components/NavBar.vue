@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { isDark } from '@/utils'
+const isProd = import.meta.env.PROD
 </script>
 
 <template>
@@ -19,10 +20,10 @@ import { isDark } from '@/utils'
           <span class="<md:hidden">Blog</span>
           <ri-article-line class="md:hidden" />
         </router-link>
-        <!-- <router-link to="/projects">
-                    <span class="<md:hidden">Projects</span>
-                    <ri-lightbulb-line class="md:hidden" />
-                </router-link>-->
+        <router-link v-if="!isProd" to="/drafts">
+          <span class="<md:hidden">Drafts</span>
+          <fluent-drafts-16-regular class="md:hidden" />
+        </router-link>
         <a href="https://github.com/ArcherGu" target="_blank" title="GitHub">
           <uil-github-alt />
         </a>

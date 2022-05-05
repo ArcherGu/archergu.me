@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 
+interface Props {
+  routeType?: 'posts' | 'drafts'
+}
+const {
+  routeType = 'posts',
+} = defineProps<Props>()
+
 const getFrontmatter = (route: any) => {
   return (route.meta as any).frontmatter
 }
@@ -8,7 +15,7 @@ const getFrontmatter = (route: any) => {
 const router = useRouter()
 const routes = router
   .getRoutes()
-  .filter(i => i.path.startsWith('/posts') && getFrontmatter(i).date)
+  .filter(i => i.path.startsWith(`/${routeType}`) && getFrontmatter(i).date)
   .sort(
     (a, b) =>
       +new Date(getFrontmatter(b).date)

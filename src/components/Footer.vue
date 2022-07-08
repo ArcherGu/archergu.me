@@ -2,11 +2,15 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-const isCenter = computed(() => route.path === '/')
+const isHome = computed(() => route.path === '/')
 </script>
 
 <template>
-  <div class="mt-10 mb-6 prose m-auto opacity-70" :class="isCenter ? 'text-center' : ''">
+  <div
+    class="mt-10 mb-6 prose m-auto opacity-70" :class="{
+      'home-footer': isHome,
+    }"
+  >
     <span class="text-sm">
       <a
         target="_blank"
@@ -17,3 +21,12 @@ const isCenter = computed(() => route.path === '/')
     </span>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.home-footer {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+</style>

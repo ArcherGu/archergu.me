@@ -4,9 +4,8 @@ import { useRoute } from 'vue-router'
 import { isClient, useEventListener } from '@vueuse/core'
 import { formatDate } from '@/utils'
 
-const route = useRoute()
 const { frontmatter } = defineProps<{ frontmatter: any }>()
-
+const route = useRoute()
 const tags = computed(() => {
   const { tags } = frontmatter
   let { tagsColor } = frontmatter

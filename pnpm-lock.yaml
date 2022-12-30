@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  '@antv/g2plot@2.4.23':
+    hash: t5imbzutfsstuuriyclk2sh7iu
+    path: patches/@antv__g2plot@2.4.23.patch
+
 specifiers:
   '@antv/g2plot': ^2.4.23
   '@iconify/json': ^2.1.158
@@ -44,7 +49,7 @@ specifiers:
   windicss: ^3.5.6
 
 dependencies:
-  '@antv/g2plot': 2.4.23
+  '@antv/g2plot': 2.4.23_t5imbzutfsstuuriyclk2sh7iu
   '@vueuse/core': 9.9.0_vue@3.2.45
   '@vueuse/head': 1.0.22_vue@3.2.45
   dayjs: 1.11.7
@@ -313,7 +318,7 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@antv/g2plot/2.4.23:
+  /@antv/g2plot/2.4.23_t5imbzutfsstuuriyclk2sh7iu:
     resolution: {integrity: sha512-GnrSuUclOKYq/V1sb0WWUM37IV0VKWOA2Klq0jmfj8gLI2r3A9bFzKj+EEg8sr2Hlfo2Iztvt77HYv4laxLUSQ==}
     dependencies:
       '@antv/event-emitter': 0.1.3
@@ -326,6 +331,7 @@ packages:
       size-sensor: 1.0.1
       tslib: 2.4.0
     dev: false
+    patched: true
 
   /@antv/matrix-util/3.0.4:
     resolution: {integrity: sha512-BAPyu6dUliHcQ7fm9hZSGKqkwcjEDVLVAstlHULLvcMZvANHeLXgHEgV7JqcAV/GIhIz8aZChIlzM1ZboiXpYQ==}

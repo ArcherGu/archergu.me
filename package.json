@@ -54,6 +54,11 @@
     "vue-tsc": "^1.0.18",
     "windicss": "^3.5.6"
   },
+  "pnpm": {
+    "patchedDependencies": {
+      "@antv/g2plot@2.4.23": "patches/@antv__g2plot@2.4.23.patch"
+    }
+  },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
   },

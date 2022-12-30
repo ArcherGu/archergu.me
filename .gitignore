@@ -9,3 +9,4 @@ components.d.ts
 auto-imports.d.ts
 temp
 .pnpm-debug.log
+.ncurc.json

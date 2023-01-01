@@ -112,9 +112,11 @@ watch(
 <template>
   <div class="my-self text-center">
     <div ref="wordCloudRef" />
-    <span ref="inputRef" class="text-lg" />
-    <button v-if="showReplay" class="icon-btn" @click="replay">
-      <mdi-replay style="display: inline; vertical-align: text-top" />
-    </button>
+    <div class="text-lg h-8">
+      <span ref="inputRef" />
+      <button v-if="showReplay" class="icon-btn" @click="replay">
+        <mdi-replay style="display: inline; vertical-align: text-top" />
+      </button>
+    </div>
   </div>
 </template>

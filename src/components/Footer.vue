@@ -8,7 +8,7 @@ const isHome = computed(() => route.path === '/')
 <template>
   <div
     class="mt-10 mb-6 prose m-auto opacity-70" :class="{
-      'home-footer': isHome,
+      'text-center': isHome,
     }"
   >
     <span class="text-sm">
@@ -21,12 +21,3 @@ const isHome = computed(() => route.path === '/')
     </span>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.home-footer {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-</style>

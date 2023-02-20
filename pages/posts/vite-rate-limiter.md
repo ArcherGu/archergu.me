@@ -6,10 +6,6 @@ tagsColor: ['#ba38fe', '#43853d', '#DB4D6D', '#268785']
 duration: 20min
 ---
 
-<blockquote>
-在 Vite 的开发模式下，会启动一个 ViteDevServer, 其本质是一个 connect 服务。Vite 利用 ESM 的特性，前端在需要什么文件时就将请求发送给 ViteDevServer，它会将文件按照需要进行转换（或者不转换）返回给前端
-</blockquote>
-
 ## 起因
 
 最近在做一个 WebGL 的项目，需要加载一些模型文件到三维场景中。模型文件的体积通常比较大，所以会有一定的加载时间，我们常规的做法肯定是在这个加载过程中显示一个类似于进度条一样的东西来告知用户正在加载中。显然，这个进度条也成为了开发需求的一部分。
@@ -116,7 +112,7 @@ throttle.on('end', () => response.end())
 
 通过上述插件，我们直接在 ViteDevServer 中实现了限流功能，从后端处来模拟不良网络环境，降低前端开发对此类问题的调试成本。当然，这只是本文描述的一种场景，也许你可以通过这个插件的实现思路，来做一些更加有趣的事情。
 
-这个限流插件目前已经放在我的 <mdi-github /> [Github](https://github.com/ArcherGu) 上，欢迎大家使用和提出意见: [vite-plugin-rate-limiter](https://github.com/ArcherGu/vite-plugin-rate-limiter.git) .
+这个限流插件目前已经放在我的 <mdi-github /> [Github](https://github.com/ArcherGu) 上，欢迎大家使用和提出意见: [vite-plugin-rate-limiter](https://github.com/ArcherGu/vite-plugin-rate-limiter.git) 。
 
 
 
